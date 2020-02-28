@@ -65,7 +65,7 @@ class DecompositionTree():
         return ret
 
     def __repr__(self):
-        return '<tree node representation>'
+        return '<Decomposition node>'
 
 
 class NFATree():
@@ -75,9 +75,7 @@ class NFATree():
     def __init__(self, state = None):
         self.state = state
         self.transitions = []
-        self.isFirst = False
-        self.isLast = False
-        self.isEndState = False
+        self.isAcceptanceState = False
     
     def setState(self, state):
         self.state = state
@@ -90,6 +88,12 @@ class NFATree():
     
     def getTransition(self):
         return self.transitions
+
+    def setIsAcceptanceState(self, value = True):
+        self.isAcceptanceState = value
+    
+    def getIsAcceptanceState(self):
+        return self.isAcceptanceState
 
     def __repr__(self):
         return '<NFA node> ' + str(self.state)
