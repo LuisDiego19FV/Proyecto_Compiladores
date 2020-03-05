@@ -98,4 +98,34 @@ class NFATree():
     def __repr__(self):
         return '<NFA node> ' + str(self.state)
 
+class DFATree():
+    state = None
+    transitions = []
+
+    def __init__(self, state = None):
+        self.state = state
+        self.transitions = []
+        self.isAcceptanceState = False
+    
+    def setState(self, state):
+        self.state = state
+
+    def getState(self):
+        return self.state
+    
+    def setTransition(self, to, by):
+        self.transitions.append((to,by))
+    
+    def getTransition(self):
+        return self.transitions
+
+    def setIsAcceptanceState(self, value = True):
+        self.isAcceptanceState = value
+    
+    def getIsAcceptanceState(self):
+        return self.isAcceptanceState
+
+    def __repr__(self):
+        return '<NFA node> ' + str(self.state)
+
     

@@ -1,5 +1,6 @@
 from nodes import DecompositionTree as dt
 from nodes import NFATree as nt
+from nodes import DFATree as dfat
 
 # regexToExpr(String)
 # Separa cada elemento del regex en sus componentes y operadores
@@ -40,6 +41,17 @@ def regexToExpr(regex):
             expresions.append(regex[i])
         
     return expresions
+
+def regexToAlphabet(regex):
+    alphabet = []
+
+    for i in regex:
+        if i not in ("(", ")", "*", "+", "?", "|"):
+            alphabet.append(i)
+
+    alphabet = list(dict.fromkeys(alphabet))
+    
+    return alphabet
 
 # exprToDecompTree(Array, int)
 # Pasa cada expresion a un arbol donde se separa segun elementos y operadores, todo
@@ -164,20 +176,20 @@ def leafToNFA(leaf, nodes = [], cnt = 0, first = True):
             tmp_nodes = leafToNFA(tmp_leaf, [], counter, False)
             nodes += tmp_nodes
             hAndT = (tmp_nodes[0], tmp_nodes[len(tmp_nodes) - 1])
-            counter += len(tmp_nodes)
+            counter += len(tmp_nodes) + 2
 
     # aplica las reglas de thompson segun los operandos
     for operant in operants:
         # OR
-        if operant == "|":
+        if operant == "|" and len(components) == 2:
             counter += 2
             new_node1 = nt("T" + str(counter - 1))
             new_node2 = nt("T" + str(counter))
             for i in components:
-                new_node1.setTransition(i[0], "Ep")
-                i[::-1][0].setTransition(new_node2, "Ep")
-                nodes.insert(0, new_node1)
-                nodes.append(new_node2)
+                new_node1.setTransition(i[0], "ε")
+                i[::-1][0].setTransition(new_node2, "ε")
+            nodes.insert(0, new_node1)
+            nodes.append(new_node2)
             hAndT = [new_node1, new_node2]
         # Kleen and other
         elif operant in ("*", "+", "?"):
@@ -185,12 +197,12 @@ def leafToNFA(leaf, nodes = [], cnt = 0, first = True):
             new_node1 = nt("T" + str(counter - 1))
             new_node2 = nt("T" + str(counter))
             component = components[0]
-            new_node1.setTransition(component[0], "Ep")
+            new_node1.setTransition(component[0], "ε")
             if operant in ("*", "?"):
-                new_node1.setTransition(new_node2, "Ep")
+                new_node1.setTransition(new_node2, "ε")
             if operant in ("*", "+"):
-                component[1].setTransition(component[0], "Ep")
-            component[1].setTransition(new_node2, "Ep")
+                component[1].setTransition(component[0], "ε")
+            component[1].setTransition(new_node2, "ε")
             nodes.insert(0, new_node1)
             nodes.append(new_node2)
             hAndT = [new_node1, new_node2]
@@ -230,11 +242,34 @@ def leafToNFA(leaf, nodes = [], cnt = 0, first = True):
     # renombrar la lista solo una vez
     if first:
         nodes = list(dict.fromkeys(nodes))
+
+        # nodes en transiciones
+        list_tmp = []
+        for i in nodes:
+            for j in i.getTransition():
+                list_tmp.append(j[0])
+        
+        list_tmp = list(dict.fromkeys(list_tmp))
+
+        # nodes
+        nodes_tmp = []
+        last_ones = []
+        for i in nodes:
+            if i not in list_tmp:
+                nodes_tmp.insert(0, i)
+            elif i.getTransition() == []:
+                i.setIsAcceptanceState()
+                last_ones.append(i)
+            else:
+                nodes_tmp.append(i)
+
+        nodes_tmp += last_ones
+        nodes = nodes_tmp
+
         counter = 0
         for i in nodes:
             i.setState("T" + str(counter))
             counter += 1
-        nodes[len(nodes)-1].setIsAcceptanceState()
 
     return nodes
 
@@ -254,7 +289,7 @@ def eclosure(nodes_pos, nodes):
     for node_pos in nodes_pos:
         init_node = nodes[node_pos]
         for i in init_node.getTransition():
-            if i[1] == "Ep":
+            if i[1] == "ε":
                 closure.append(int(i[0].getState()[1]))
                 closure += eclosure([nodes.index(i[0])], nodes)
 
@@ -271,10 +306,59 @@ def move(s, c, nodes):
         for i in init_node.getTransition():
             if i[1] == c:
                 movers.append(int(i[0].getState()[1:]))
-                movers += move([nodes.index(i[0])], c, nodes)
+                # movers += move([nodes.index(i[0])], c, nodes)
 
     movers = list(dict.fromkeys(movers))
     return movers
+
+def fromNFAtoDFA(nodes, alphabet):
+
+    # SUBSET CONSTRUCTION
+    dStates = [eclosure([0],nodes)]
+    dStatesMarkers = [False]
+    dTrans = []
+
+    while (False in dStatesMarkers):
+
+        # mark T and get index
+        state = 0
+        for i in range(len(dStatesMarkers)):
+            if dStatesMarkers[i] == False:
+                state = i
+                dStatesMarkers[i] = True
+                break
+
+        t = dStates[state]
+        
+        # for each input i
+        for i in alphabet:
+            u = eclosure(move(t, i, nodes), nodes)
+            u.sort()
+            if u not in dStates:
+                dStates.append(u)
+                dStatesMarkers.append(False)
+            dTrans.append((state, dStates.index(u), i))
+    
+    # FROM STATES AND TRANSITIONS TO DFA TREE
+    nodes_dfa = []
+    counter = 0
+    for i in dStates:
+        node_tmp = dfat("T" + str(counter))
+        for j in i:
+            if nodes[j].getIsAcceptanceState():
+                node_tmp.setIsAcceptanceState()
+        nodes_dfa.append(node_tmp)
+        counter += 1
+    
+    for i in dTrans:
+        who = i[0]
+        to = i[1]
+        by = i[2]
+
+        nodes_dfa[who].setTransition(nodes[to],by)
+    
+    return nodes_dfa
+
 
 # simulateNFA("string", <NFA node>[])
 # se simula la corrida de un NFA por medio de un loop, eclosure y move
@@ -288,6 +372,19 @@ def simulateNFA(word, nodes):
     
     for i in s:
         if nodes[i].getIsAcceptanceState():
-            ret = "YES"
+            ret = "SI"
+
+    return ret
+
+def simulateDFA(word, nodes):
+    ret = "NO"
+    s = [0]
+
+    for c in word:
+        s = move(s, c, nodes)
+    
+    for i in s:
+        if nodes[i].getIsAcceptanceState():
+            ret = "SI"
 
     return ret
