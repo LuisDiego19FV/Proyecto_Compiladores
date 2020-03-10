@@ -1,0 +1,24 @@
+digraph {
+	fake0 [style=invisible]
+	T8 [shape=doublecircle]
+	T7
+	T6
+	T3
+	T1
+	T4
+	T5
+	T0 [root=true]
+	T2
+	fake0 -> T0 [style=bold]
+	T0 -> T1 [label=EP]
+	T1 -> T2 [label=A]
+	T2 -> T3 [label=EP]
+	T2 -> T1 [label=EP]
+	T3 -> T4 [label=A]
+	T4 -> T5 [label=B]
+	T5 -> T6 [label=EP]
+	T5 -> T8 [label=EP]
+	T6 -> T7 [label=B]
+	T7 -> T6 [label=EP]
+	T7 -> T8 [label=EP]
+}

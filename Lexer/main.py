@@ -7,16 +7,17 @@ regex = input("Ingrese regex: ")
 # Paso 1: Leer regex
 expr = lex.regexToExpr(regex)
 alphabet = lex.regexToAlphabet(regex) 
-# Paso 2: Descomponer la expresion en un arbol
-root = lex.exprToDecompTree(expr)
+# Paso 2: Descomponer la expresion en arboles
+rootNFA = lex.exprToDecompTreeNFA(expr)
+rootDFA = lex.exprToDecompTreeDFA(expr)
 # Paso 3: Arbol a NFA
-nodes_nfa = lex.rootToNFA(root)
+nodes_nfa = lex.rootToNFA(rootNFA)
 autPrint.printNFA(nodes_nfa, regex + "_nfa")
-print("NFA completado")
+print("NFA 1 completado")
 # Paso 4: NFA to DFA
 nodes_dfa = lex.fromNFAtoDFA(nodes_nfa, alphabet)
 autPrint.printNFA(nodes_dfa, regex + "_dfa")
-print("DFA completado")
+print("DFA 1 completado")
 
 # Prueba del Automatas
 while True:

@@ -1,4 +1,5 @@
 from nodes import DecompositionTree as dt
+from nodes import DecompositionTreeDFA as dfadt
 from nodes import NFATree as nt
 from nodes import DFATree as dfat
 
@@ -42,6 +43,9 @@ def regexToExpr(regex):
         
     return expresions
 
+# regexToAlphabet(String)
+# Devuelve un array con solo los componentes en el abecedario utilizado por el lenguaje
+# descrito por el regex
 def regexToAlphabet(regex):
     alphabet = []
 
@@ -57,7 +61,7 @@ def regexToAlphabet(regex):
 # Pasa cada expresion a un arbol donde se separa segun elementos y operadores, todo
 # bajo un orden logico
 # Regresa el root de un arbol con los elementos
-def exprToDecompTree(expr, cnt = 0):
+def exprToDecompTreeNFA(expr, cnt = 0):
     expr = expr[::-1]
     root = dt(cnt)
     tmpRoot = root
@@ -107,7 +111,7 @@ def exprToDecompTree(expr, cnt = 0):
 
             counter += 1
             parth_expr = regexToExpr(i[1:len(i)-1])
-            parth_root = exprToDecompTree(parth_expr, counter)
+            parth_root = exprToDecompTreeNFA(parth_expr, counter)
             newNode.setChild(parth_root, 1)
         
         # caso de letras
@@ -115,6 +119,126 @@ def exprToDecompTree(expr, cnt = 0):
             newChildrenNode = dt(i, True)
             newNode.setChild(newChildrenNode, 1)
             newNode.setIsComponent(True)
+
+    return root
+
+# indexSetter(<Decomposition Node for DFA>, int, boolean)
+# Pone los indices a los componentes
+def indexSetter(root, index = 1, initial = True):
+    
+    # pone indices a los componentes
+    children = root.getChild()
+    for i in children:
+        if i == None:
+            continue
+        else:
+            index = indexSetter(i, index, False)
+
+    # en caso que no es recursion
+    if initial:
+        return root
+
+    # salida de recursion
+    if root.getIsComponent() and root.getValue != "ε":
+        root.setComponentIndex(index)
+        index += 1
+
+    return index
+
+# exprToDecompTree(Array, int)
+# Pasa cada expresion a un arbol donde se separa segun elementos y operadores, todo
+# bajo un orden logico para armar DFAs luego
+# Regresa el root de un arbol con los elementos
+def exprToDecompTreeDFA(expr, reps = 0):
+    miniTrees = []
+    
+    # quitar + y ? por sus representaciones en * y |
+    newExpr = []
+    for i in expr:
+        last = len(i)-1
+        if i[last] == "+":
+            newExpr.append(i[0:last])
+            newExpr.append(i[0:last] + "*")
+        elif i[last] == "?":
+            newExpr.append("(" + i[0:last] + "|ε)")
+        else:
+            newExpr.append(i)
+
+    # regresar a utilizar la variable expr envez de newExpr
+    expr = newExpr
+
+    # se hacen los nodos para el arbol
+    for i in expr:
+        expresion = i[::-1]
+        tmpRoot = dfadt(None)
+        rootIsSet = False
+        counter = 0
+
+        for j in expresion:
+            if j in ("*","?","+", "|"):
+                tmpRoot.setValue(j)
+                rootIsSet = True
+            elif j == ")":
+                last = len(expresion) - 1
+                toExpr = expresion[counter + 1:last]
+                tmpExpr = regexToExpr(toExpr[::-1])
+                newNode = exprToDecompTreeDFA(tmpExpr, reps + 1)
+                if rootIsSet:
+                    tmpRoot.setChild(newNode, 1)
+                else:
+                    tmpRoot = newNode
+                break
+            else:
+                if rootIsSet:
+                    tmpRoot.setChild(dfadt(j, True), 1)
+                else:
+                    tmpRoot.setValue(j)
+                    tmpRoot.setIsComponent(True)
+
+            counter += 1
+
+        miniTrees.append(tmpRoot)
+
+    # se lee los nodos y se acomoda para el caso de OR
+    newMiniTrees = []
+    skips = 0
+    for i in range(len(miniTrees)):
+        if skips > 0:
+            skips -= 1
+        elif miniTrees[i].getValue() == "|":
+            miniTrees[i].setChild(miniTrees[i-1], 0)
+            miniTrees[i].setChild(miniTrees[i+1], 1)
+            skips += 1
+            newMiniTrees.pop(i-1)
+            newMiniTrees.append(miniTrees[i])
+        else:
+            newMiniTrees.append(miniTrees[i])
+
+    # se regresa a utilizar miniTrees envez de newMiniTrees
+    miniTrees = newMiniTrees
+
+    # se empieza el nuevo arbol
+    root = dfadt(".")
+    root.setChild(dfadt("#", True), 1)
+    tmpRoot = root
+    miniTrees = miniTrees[::-1]
+    for i in range(len(miniTrees)):
+        
+        if i == len(miniTrees) - 1:
+            tmpRoot.setChild(miniTrees[i], 0)
+        else:
+            newRoot = dfadt(".")
+            tmpRoot.setChild(newRoot, 0)
+            tmpRoot = newRoot
+
+            tmpRoot.setChild(miniTrees[i], 1)
+    
+    # caso si se llamo en recursion
+    if reps != 0:
+        return root.getChild()[0]
+
+    # pone los indices a los componentes
+    root = indexSetter(root)
 
     return root
 
@@ -311,6 +435,9 @@ def move(s, c, nodes):
     movers = list(dict.fromkeys(movers))
     return movers
 
+# fromNFAtoDFA(<NFA nodes>[], string[])
+# Usando el algoritmo de subset construction se convierte un NFA a un DFA
+# luego con los states y transitions se convierte a un DFA tree
 def fromNFAtoDFA(nodes, alphabet):
 
     # SUBSET CONSTRUCTION
@@ -362,7 +489,7 @@ def fromNFAtoDFA(nodes, alphabet):
 
 # simulateNFA("string", <NFA node>[])
 # se simula la corrida de un NFA por medio de un loop, eclosure y move
-# se devuelve NO o YES si la palabra pertenece al lenguaje descrito por el NFA
+# se devuelve NO o SI si la palabra pertenece al lenguaje descrito por el NFA
 def simulateNFA(word, nodes):
     ret = "NO"
     s = eclosure([0],nodes)
@@ -376,6 +503,9 @@ def simulateNFA(word, nodes):
 
     return ret
 
+# simulateNFA("string", <DFA node>[])
+# se simula la corrida de un DFA por medio de un loop, eclosure y move
+# se devuelve NO o SI si la palabra pertenece al lenguaje descrito por el NFA
 def simulateDFA(word, nodes):
     ret = "NO"
     s = [0]
@@ -388,3 +518,7 @@ def simulateDFA(word, nodes):
             ret = "SI"
 
     return ret
+    
+
+
+        
