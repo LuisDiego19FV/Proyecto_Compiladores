@@ -5,19 +5,21 @@ digraph {
     T0
     T1
     T2
-    T3
-    T4 [shape=doublecircle]
-    T5 [shape=doublecircle]
-    T0 -> T1 [label="A"]
-    T0 -> T2 [label="B"]
-    T1 -> T3 [label="A"]
-    T1 -> T2 [label="B"]
-    T2 -> T2 [label="A"]
-    T2 -> T2 [label="B"]
-    T3 -> T3 [label="A"]
-    T3 -> T4 [label="B"]
-    T4 -> T2 [label="A"]
-    T4 -> T5 [label="B"]
-    T5 -> T2 [label="A"]
-    T5 -> T5 [label="B"]
+    T3 [shape=doublecircle]
+    T4
+    T0 -> T1 [label="a"]
+    T0 -> T2 [label="b"]
+    T0 -> T3 [label="c"]
+    T1 -> T1 [label="a"]
+    T1 -> T4 [label="b"]
+    T1 -> T3 [label="c"]
+    T2 -> T4 [label="a"]
+    T2 -> T2 [label="b"]
+    T2 -> T3 [label="c"]
+    T3 -> T4 [label="a"]
+    T3 -> T4 [label="b"]
+    T3 -> T4 [label="c"]
+    T4 -> T4 [label="a"]
+    T4 -> T4 [label="b"]
+    T4 -> T4 [label="c"]
 }

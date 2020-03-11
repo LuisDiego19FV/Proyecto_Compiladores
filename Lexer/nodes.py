@@ -75,7 +75,10 @@ class DecompositionTreeDFA():
         self.children = [None, None]
         self.isComponent = isComponent
         self.componetIndex = componetIndex
-        self.isNullable = False
+        self.isNullable = None
+        self.firstpos = []
+        self.lastpos = []
+        self.followpos = []
     
     def setValue(self, value):
         self.value = value
@@ -119,6 +122,45 @@ class DecompositionTreeDFA():
     def getIsNullable(self):
         return self.isNullable
 
+    def setFirstpos(self, pos):
+        self.firstpos = pos
+
+    def getFirstpos(self):
+        return self.firstpos
+
+    def setLastpos(self, pos):
+        self.lastpos = pos
+
+    def getLastpos(self):
+        return self.lastpos
+
+    def setFollowpos(self, pos):
+        self.followpos = pos
+
+    def getFollowpos(self):
+        return self.followpos
+
+    def getLastposTree(self, level=0):
+        ret = "-- "*level + self.value + " " + repr(self.lastpos)+"\n"
+        for child in self.children:
+            if type(child) == type(self):
+                ret += child.getLastposTree(level + 1)
+        return ret
+
+    def getFirstposTree(self, level=0):
+        ret = "-- "*level + self.value + " " + repr(self.firstpos)+"\n"
+        for child in self.children:
+            if type(child) == type(self):
+                ret += child.getFirstposTree(level + 1)
+        return ret
+
+    def getNullableTree(self, level=0):
+        ret = "-- "*level + self.value + " " + repr(self.isNullable)+"\n"
+        for child in self.children:
+            if type(child) == type(self):
+                ret += child.getNullableTree(level + 1)
+        return ret
+
     def __str__(self, level=0):
         if self.componetIndex == None:
             ret = "-- "*level+repr(self.value)+"\n"
@@ -130,7 +172,10 @@ class DecompositionTreeDFA():
         return ret
 
     def __repr__(self):
-        return '<Decomposition node for dfa>'
+        if self.componetIndex == None:
+            return '<Decomposition node dfa>'
+        else:
+            return '<Decomposition node dfa index-' + str(self.componetIndex) + '>'
 
 class NFATree():
     state = None

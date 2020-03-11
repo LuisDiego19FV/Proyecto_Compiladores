@@ -139,7 +139,7 @@ def indexSetter(root, index = 1, initial = True):
         return root
 
     # salida de recursion
-    if root.getIsComponent() and root.getValue != "ε":
+    if root.getIsComponent() and root.getValue() != "ε":
         root.setComponentIndex(index)
         index += 1
 
@@ -184,13 +184,13 @@ def exprToDecompTreeDFA(expr, reps = 0):
                 tmpExpr = regexToExpr(toExpr[::-1])
                 newNode = exprToDecompTreeDFA(tmpExpr, reps + 1)
                 if rootIsSet:
-                    tmpRoot.setChild(newNode, 1)
+                    tmpRoot.setChild(newNode, 0)
                 else:
                     tmpRoot = newNode
                 break
             else:
                 if rootIsSet:
-                    tmpRoot.setChild(dfadt(j, True), 1)
+                    tmpRoot.setChild(dfadt(j, True), 0)
                 else:
                     tmpRoot.setValue(j)
                     tmpRoot.setIsComponent(True)
@@ -205,7 +205,7 @@ def exprToDecompTreeDFA(expr, reps = 0):
     for i in range(len(miniTrees)):
         if skips > 0:
             skips -= 1
-        elif miniTrees[i].getValue() == "|":
+        elif miniTrees[i].getValue() == "|" and len(miniTrees) >= 3:
             miniTrees[i].setChild(miniTrees[i-1], 0)
             miniTrees[i].setChild(miniTrees[i+1], 1)
             skips += 1
@@ -518,7 +518,237 @@ def simulateDFA(word, nodes):
             ret = "SI"
 
     return ret
-    
+
+def nullableTree(root, first = True, stopOn = None):
+
+    if first:
+        leaf = rootToLeaf(root)
+    else:
+        leaf = root
+
+    children = leaf.getChild()
+    for i in children:
+        if i == None:
+            continue 
+        elif i.getIsComponent():
+            if i.getValue() == "ε":
+                i.setIsNullable(True)
+            else:
+                i.setIsNullable(False)
+        elif i.getIsNullable() != None:
+            continue
+        else:
+            leaf = rootToLeaf(i)
+            nullableTree(leaf, False, i)
+
+    if leaf.getValue() == "|":
+        valToSet = children[0].getIsNullable() or children[1].getIsNullable()
+        leaf.setIsNullable(valToSet)
+    elif leaf.getValue() == ".":
+        valToSet = children[0].getIsNullable() and children[1].getIsNullable()
+        leaf.setIsNullable(valToSet)
+    else:
+        leaf.setIsNullable(True)
+
+    parent = leaf.getParent()
+
+    if leaf == stopOn or parent == None:
+        return 0
+    else:
+        nullableTree(parent, False)
+
+def firstposTree(root, first = True, stopOn = None):
+    if first:
+        leaf = rootToLeaf(root)
+    else:
+        leaf = root
+
+    children = leaf.getChild()
+    for i in children:
+        if i == None:
+            continue 
+        elif i.getIsComponent():
+            if i.getValue() == "ε":
+                i.setFirstpos([None])
+            else:
+                i.setFirstpos([i.getComponentIndex()])
+        elif i.getFirstpos() != []:
+            continue
+        else:
+            tmpLeaf = rootToLeaf(i)
+            firstposTree(tmpLeaf, False, i)
+
+    if leaf.getValue() == "|":
+        valToSet = children[0].getFirstpos() + children[1].getFirstpos()
+        leaf.setFirstpos(valToSet)
+    elif leaf.getValue() == ".":
+        if children[0].getIsNullable():
+            valToSet = children[0].getFirstpos() + children[1].getFirstpos()
+            leaf.setFirstpos(valToSet)
+        else:
+            valToSet = children[0].getFirstpos()
+            leaf.setFirstpos(valToSet)
+    else:
+        leaf.setFirstpos(children[0].getFirstpos())
+
+    parent = leaf.getParent()
+
+    if leaf == stopOn or parent == None:
+        return 0
+    else:
+        firstposTree(parent, False)
 
 
+def lastposTree(root, first = True, stopOn = None):
+    if first:
+        leaf = rootToLeaf(root)
+    else:
+        leaf = root
+
+    children = leaf.getChild()
+    for i in children:
+        if i == None:
+            continue 
+        elif i.getIsComponent():
+            if i.getValue() == "ε":
+                i.setLastpos([None])
+            else:
+                i.setLastpos([i.getComponentIndex()])
+        elif i.getLastpos() != []:
+            continue
+        else:
+            tmpLeaf = rootToLeaf(i)
+            lastposTree(tmpLeaf, False, i)
+
+    if leaf.getValue() == "|":
+        valToSet = children[0].getLastpos() + children[1].getLastpos()
+        leaf.setLastpos(valToSet)
+    elif leaf.getValue() == ".":
+        if children[1].getIsNullable():
+            valToSet = children[0].getLastpos() + children[1].getLastpos()
+            leaf.setLastpos(valToSet)
+        else:
+            valToSet = children[1].getLastpos()
+            leaf.setLastpos(valToSet)
+    else:
+        leaf.setLastpos(children[0].getLastpos())
+
+    parent = leaf.getParent()
+
+    if leaf == stopOn or parent == None:
+        return 0
+    else:
+        lastposTree(parent, False)
+
+def nodesOfPos(root):
+    nodes = []
+
+    # pone indices a los componentes
+    children = root.getChild()
+    for i in children:
+        if i == None:
+            continue
+        else:
+            if i.getIsComponent() and i.getValue() != "ε":
+                nodes.append(i)
+            elif i.getValue() != "ε":
+                nodes += nodesOfPos(i)
+
+    return nodes
+
+def notComponentNodes(root):
+    nodes = [root]
+
+    # pone indices a los componentes
+    children = root.getChild()
+    for i in children:
+        if i == None or i.getIsComponent():
+            continue
+        else:
+            nodes += notComponentNodes(i)
+
+    return nodes
+
+
+def followpos(root):
+
+    nodesPos = nodesOfPos(root)
+    notComponents = notComponentNodes(root)
+
+    for i in notComponents:
+        if i.getValue() == ".":
+            children = i.getChild()
+            for j in children[0].getLastpos():
+                valToSet = nodesPos[j-1].getFollowpos() + children[1].getFirstpos()
+                nodesPos[j-1].setFollowpos(valToSet)
+        elif i.getValue() == "*":
+            for j in i.getLastpos():
+                valToSet = nodesPos[j-1].getFollowpos() + i.getFirstpos()
+                nodesPos[j-1].setFollowpos(valToSet)
+
+    for i in nodesPos:
+        valToSet = i.getFollowpos()
+        valToSet.sort()
+        i.setFollowpos(valToSet)
+
+def rootToDFA(root, alphabet):
+
+    nullableTree(root)
+    firstposTree(root)
+    lastposTree(root)
+    followpos(root)
+
+    dStates = [root.getFirstpos()]
+    dStatesMarkers = [False]
+    dTrans = []
+
+    nodesPos = nodesOfPos(root)
+
+    while (False in dStatesMarkers):
+
+        # mark T and get index
+        state = 0
+        for i in range(len(dStatesMarkers)):
+            if dStatesMarkers[i] == False:
+                state = i
+                dStatesMarkers[i] = True
+                break
+
+        t = dStates[state]
         
+        # for each input i
+        for i in alphabet:
+            u = []
+            for j in t:
+                if nodesPos[j-1].getValue() == i:
+                    u += nodesPos[j-1].getFollowpos()
+
+            u = list(dict.fromkeys(u))
+            u.sort()
+
+            if u not in dStates:
+                dStates.append(u)
+                dStatesMarkers.append(False)
+
+            dTrans.append((state, dStates.index(u), i))
+
+    # FROM STATES AND TRANSITIONS TO DFA TREE
+    nodes_dfa = []
+    counter = 0
+    for i in dStates:
+        node_tmp = dfat("T" + str(counter))
+        for j in i:
+            if j == len(nodesPos):
+                node_tmp.setIsAcceptanceState()
+        nodes_dfa.append(node_tmp)
+        counter += 1
+    
+    for i in dTrans:
+        who = i[0]
+        to = i[1]
+        by = i[2]
+
+        nodes_dfa[who].setTransition(nodes_dfa[to],by)
+    
+    return nodes_dfa
+
