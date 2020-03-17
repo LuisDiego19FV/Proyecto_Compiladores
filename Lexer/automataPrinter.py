@@ -39,4 +39,4 @@ def printNFA(nodes, name_output):
         else:
             name_toprint += i
 
-    automata_IO.nfa_to_dot(nfa, "output/" + str(name_toprint))
+    automata_IO.nfa_to_dot(nfa, "output/" + str(name_toprint)[:len(name_toprint)-6] + "/" + str(name_toprint))

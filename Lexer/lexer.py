@@ -50,7 +50,7 @@ def regexToAlphabet(regex):
     alphabet = []
 
     for i in regex:
-        if i not in ("(", ")", "*", "+", "?", "|"):
+        if i not in ("(", ")", "*", "+", "?", "|", "ε"):
             alphabet.append(i)
 
     alphabet = list(dict.fromkeys(alphabet))
@@ -200,22 +200,23 @@ def exprToDecompTreeDFA(expr, reps = 0):
         miniTrees.append(tmpRoot)
 
     # se lee los nodos y se acomoda para el caso de OR
-    newMiniTrees = []
-    skips = 0
-    for i in range(len(miniTrees)):
-        if skips > 0:
-            skips -= 1
-        elif miniTrees[i].getValue() == "|" and len(miniTrees) >= 3:
-            miniTrees[i].setChild(miniTrees[i-1], 0)
-            miniTrees[i].setChild(miniTrees[i+1], 1)
-            skips += 1
-            newMiniTrees.pop(i-1)
-            newMiniTrees.append(miniTrees[i])
-        else:
-            newMiniTrees.append(miniTrees[i])
+    if "|" in expr:
+        newMiniTrees = []
+        skips = 0
+        for i in range(len(miniTrees)):
+            if skips > 0:
+                skips -= 1
+            elif miniTrees[i].getValue() == "|" and len(miniTrees) >= 3 and i % 2 == 1:
+                miniTrees[i].setChild(miniTrees[i-1], 0)
+                miniTrees[i].setChild(miniTrees[i+1], 1)
+                skips += 1
+                newMiniTrees.pop(i-1)
+                newMiniTrees.append(miniTrees[i])
+            else:
+                newMiniTrees.append(miniTrees[i])
 
-    # se regresa a utilizar miniTrees envez de newMiniTrees
-    miniTrees = newMiniTrees
+        # se regresa a utilizar miniTrees envez de newMiniTrees
+        miniTrees = newMiniTrees
 
     # se empieza el nuevo arbol
     root = dfadt(".")
@@ -406,16 +407,22 @@ def rootToNFA(root):
 
 # eclosure(int[], <NFA node>[])
 # Aplica eclosure segun el array de indices dados
-def eclosure(nodes_pos, nodes):
+def eclosure(nodes_pos, nodes, closure_recursive = []):
     
     closure = nodes_pos
+
+    if closure_recursive == []:
+        closure_recursive = nodes_pos
 
     for node_pos in nodes_pos:
         init_node = nodes[node_pos]
         for i in init_node.getTransition():
             if i[1] == "ε":
-                closure.append(int(i[0].getState()[1]))
-                closure += eclosure([nodes.index(i[0])], nodes)
+                state = int(i[0].getState()[1:])
+                if state not in closure_recursive:
+                    closure.append(state)
+                    closure_recursive.append(state)
+                    closure += eclosure([nodes.index(i[0])], nodes, closure_recursive)
 
     closure = list(dict.fromkeys(closure))
     return closure
@@ -465,7 +472,7 @@ def fromNFAtoDFA(nodes, alphabet):
                 dStates.append(u)
                 dStatesMarkers.append(False)
             dTrans.append((state, dStates.index(u), i))
-    
+
     # FROM STATES AND TRANSITIONS TO DFA TREE
     nodes_dfa = []
     counter = 0
@@ -482,7 +489,7 @@ def fromNFAtoDFA(nodes, alphabet):
         to = i[1]
         by = i[2]
 
-        nodes_dfa[who].setTransition(nodes[to],by)
+        nodes_dfa[who].setTransition(nodes_dfa[to],by)
     
     return nodes_dfa
 
@@ -519,13 +526,17 @@ def simulateDFA(word, nodes):
 
     return ret
 
+# nullableTree(<Decomposition node dfa>, Bool, Bool)
+# se calcula el nullable para cada hoja del arbol
 def nullableTree(root, first = True, stopOn = None):
 
+    # first cases
     if first:
         leaf = rootToLeaf(root)
     else:
         leaf = root
 
+    # components
     children = leaf.getChild()
     for i in children:
         if i == None:
@@ -541,6 +552,7 @@ def nullableTree(root, first = True, stopOn = None):
             leaf = rootToLeaf(i)
             nullableTree(leaf, False, i)
 
+    # operators
     if leaf.getValue() == "|":
         valToSet = children[0].getIsNullable() or children[1].getIsNullable()
         leaf.setIsNullable(valToSet)
@@ -550,26 +562,33 @@ def nullableTree(root, first = True, stopOn = None):
     else:
         leaf.setIsNullable(True)
 
+    # recursion
     parent = leaf.getParent()
 
+    # return condition
     if leaf == stopOn or parent == None:
         return 0
     else:
         nullableTree(parent, False)
 
+# firstposTree(<Decomposition node dfa>, Bool, Bool)
+# se calcula el firstpos para cada hoja del arbol
 def firstposTree(root, first = True, stopOn = None):
+
+    # first cases
     if first:
         leaf = rootToLeaf(root)
     else:
         leaf = root
 
+    # components
     children = leaf.getChild()
     for i in children:
         if i == None:
             continue 
         elif i.getIsComponent():
             if i.getValue() == "ε":
-                i.setFirstpos([None])
+                i.setFirstpos([])
             else:
                 i.setFirstpos([i.getComponentIndex()])
         elif i.getFirstpos() != []:
@@ -578,6 +597,7 @@ def firstposTree(root, first = True, stopOn = None):
             tmpLeaf = rootToLeaf(i)
             firstposTree(tmpLeaf, False, i)
 
+    # operants
     if leaf.getValue() == "|":
         valToSet = children[0].getFirstpos() + children[1].getFirstpos()
         leaf.setFirstpos(valToSet)
@@ -591,27 +611,33 @@ def firstposTree(root, first = True, stopOn = None):
     else:
         leaf.setFirstpos(children[0].getFirstpos())
 
+    # recursion
     parent = leaf.getParent()
 
+    # return condition
     if leaf == stopOn or parent == None:
         return 0
     else:
         firstposTree(parent, False)
 
-
+# lastposTree(<Decomposition node dfa>, Bool, Bool)
+# se calcula el lastpos para cada hoja del arbol
 def lastposTree(root, first = True, stopOn = None):
+
+    # first cases
     if first:
         leaf = rootToLeaf(root)
     else:
         leaf = root
 
+    # components
     children = leaf.getChild()
     for i in children:
         if i == None:
             continue 
         elif i.getIsComponent():
             if i.getValue() == "ε":
-                i.setLastpos([None])
+                i.setLastpos([])
             else:
                 i.setLastpos([i.getComponentIndex()])
         elif i.getLastpos() != []:
@@ -620,6 +646,7 @@ def lastposTree(root, first = True, stopOn = None):
             tmpLeaf = rootToLeaf(i)
             lastposTree(tmpLeaf, False, i)
 
+    # operants
     if leaf.getValue() == "|":
         valToSet = children[0].getLastpos() + children[1].getLastpos()
         leaf.setLastpos(valToSet)
@@ -633,13 +660,17 @@ def lastposTree(root, first = True, stopOn = None):
     else:
         leaf.setLastpos(children[0].getLastpos())
 
+    # recursion
     parent = leaf.getParent()
 
+    # return condition
     if leaf == stopOn or parent == None:
         return 0
     else:
         lastposTree(parent, False)
 
+# nodesOfPos(<Decomposition node dfa>)
+# pone indices a cada componente del arbol de decomposicion
 def nodesOfPos(root):
     nodes = []
 
@@ -655,11 +686,11 @@ def nodesOfPos(root):
                 nodes += nodesOfPos(i)
 
     return nodes
-
+# notComponentNodes(<Decomposition node dfa>)
+# devuelve todos los nodos que no son componentes
 def notComponentNodes(root):
     nodes = [root]
 
-    # pone indices a los componentes
     children = root.getChild()
     for i in children:
         if i == None or i.getIsComponent():
@@ -669,12 +700,15 @@ def notComponentNodes(root):
 
     return nodes
 
-
+# followpos(<Decomposition node dfa>)
+# se calcula el followpos para cada hoja del arbol
 def followpos(root):
 
+    # get nodespos
     nodesPos = nodesOfPos(root)
     notComponents = notComponentNodes(root)
 
+    # calculate for all operants
     for i in notComponents:
         if i.getValue() == ".":
             children = i.getChild()
@@ -686,18 +720,24 @@ def followpos(root):
                 valToSet = nodesPos[j-1].getFollowpos() + i.getFirstpos()
                 nodesPos[j-1].setFollowpos(valToSet)
 
+    # for each node
     for i in nodesPos:
         valToSet = i.getFollowpos()
         valToSet.sort()
         i.setFollowpos(valToSet)
 
+# rootToDFA(<Decomposition node dfa>[], [])
+# Hace las operaciones segun el algoritmo de conversion directa a DFA.
+# Devuelve todos los nodos de tipo <DFA node> en el orden del DFA 
 def rootToDFA(root, alphabet):
 
+    # calculos para el arbol
     nullableTree(root)
     firstposTree(root)
     lastposTree(root)
     followpos(root)
 
+    # estados y transiciones
     dStates = [root.getFirstpos()]
     dStatesMarkers = [False]
     dTrans = []

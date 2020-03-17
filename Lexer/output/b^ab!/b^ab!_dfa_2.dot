@@ -1,0 +1,16 @@
+digraph {
+	fake0 [style=invisible]
+	T2 [shape=doublecircle]
+	T1 [shape=doublecircle]
+	T0 [root=true]
+	T3
+	fake0 -> T0 [style=bold]
+	T0 -> T0 [label=b]
+	T0 -> T1 [label=a]
+	T1 -> T2 [label=b]
+	T1 -> T3 [label=a]
+	T2 -> T3 [label=b]
+	T2 -> T3 [label=a]
+	T3 -> T3 [label=b]
+	T3 -> T3 [label=a]
+}
