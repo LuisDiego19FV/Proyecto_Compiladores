@@ -1,19 +1,19 @@
 digraph {
 	fake0 [style=invisible]
-	T2
-	T6
-	T10
-	T12
-	T0 [root=true]
-	T11
-	T13 [shape=doublecircle]
 	T3
+	T4
+	T9
 	T5
 	T8
-	T7
-	T9
 	T1
-	T4
+	T0 [root=true]
+	T6
+	T7
+	T10
+	T11
+	T2
+	T13 [shape=doublecircle]
+	T12
 	fake0 -> T0 [style=bold]
 	T0 -> T3 [label=EP]
 	T0 -> T1 [label=EP]

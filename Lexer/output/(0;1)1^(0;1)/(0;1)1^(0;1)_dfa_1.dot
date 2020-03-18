@@ -1,11 +1,11 @@
 digraph {
 	fake0 [style=invisible]
-	T2
-	T0 [root=true]
 	T3 [shape=doublecircle]
+	T4 [shape=doublecircle]
 	T5
 	T1
-	T4 [shape=doublecircle]
+	T0 [root=true]
+	T2
 	fake0 -> T0 [style=bold]
 	T0 -> T1 [label=0]
 	T0 -> T2 [label=1]

@@ -3,8 +3,8 @@ digraph {
 	T4
 	T1
 	T2
-	T5 [shape=doublecircle]
 	T0 [root=true]
+	T5 [shape=doublecircle]
 	T3 [shape=doublecircle]
 	fake0 -> T0 [style=bold]
 	T0 -> T1 [label=a]

@@ -4,22 +4,14 @@ digraph {
     fake0 -> T0 [style=bold]
     T0
     T1
-    T2
+    T2 [shape=doublecircle]
     T3 [shape=doublecircle]
-    T4
-    T0 -> T1 [label="a"]
-    T0 -> T2 [label="b"]
-    T0 -> T3 [label="c"]
+    T0 -> T0 [label="b"]
+    T0 -> T2 [label="a"]
+    T1 -> T1 [label="b"]
     T1 -> T1 [label="a"]
-    T1 -> T4 [label="b"]
-    T1 -> T3 [label="c"]
-    T2 -> T4 [label="a"]
-    T2 -> T2 [label="b"]
-    T2 -> T3 [label="c"]
-    T3 -> T4 [label="a"]
-    T3 -> T4 [label="b"]
-    T3 -> T4 [label="c"]
-    T4 -> T4 [label="a"]
-    T4 -> T4 [label="b"]
-    T4 -> T4 [label="c"]
+    T2 -> T3 [label="b"]
+    T2 -> T1 [label="a"]
+    T3 -> T1 [label="b"]
+    T3 -> T1 [label="a"]
 }
