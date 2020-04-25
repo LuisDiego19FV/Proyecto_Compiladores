@@ -1,0 +1,54 @@
+COMPILER Aritmetica    
+
+CHARACTERS 
+
+letter = A..Z + a..z. 
+digit = "0123456789".
+hexdigit = digit+"ABCDEF".
+tab = CHR(9).
+eol = CHR(10).
+space = CHR(32).
+whitespace = CHR(13)+eol+tab+space.
+
+KEYWORDS
+
+while = "while".
+do = "do".
+if = "if".
+switch = "switch"
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+number = digit{digit}.
+hexnumber = hexdigit{hexdigit}"(H)".
+whitetoken = whitespace{whitespace}
+
+PRODUCTIONS
+
+Expr= {Stat (";")}".".
+
+Stat = 							(.int value;.)
+	Expression< ref value>		(.System.Console.WriteLn(value.ToString());.)
+	.
+
+Expression<ref int result> =		(.int result1,result2;.)
+	Term< ref result1>
+	{    "+"Term< ref result2>		(.result1+=result2;.)
+	   | "-"Term< ref result2>		(.result1-=result2;.)
+	}							(.result=result1;.)
+	.
+
+Term<ref int result>=				(.int result1,result2;.)
+	Factor<ref result1>
+	{    "*"Factor<ref result2>	(.result1*=result2;.)
+	   | "/"Factor<ref result2>	(.result1/=result2;.)
+	}							(.result=result1;.)
+	.
+	
+Factor<ref int result> =	(.int signo=1;.)
+	["-"(.signo = -1;.)]
+	( Number<ref result> | "("Expression< ref result>")") (.result*=signo;.).
+	
+Number<ref int result> =  number (. result = int.Parse(lastToken.Value).).
+END Aritmetica

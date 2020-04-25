@@ -1,0 +1,57 @@
+COMPILER Double    
+
+CHARACTERS 
+
+digit="0123456789".
+tab=CHR(9).
+eol=CHR(10).
+blanco=eol+CHR(13)+tab.
+
+KEYWORDS
+
+while ="while".
+do = "do".
+
+TOKENS
+
+number = digit{digit}.
+decnumber = digit{digit}"."digit{digit}.
+white = blanco{blanco}.
+
+PRODUCTIONS
+
+
+Expr= {Stat ";"{white}}{white}".".
+
+Stat = 							(.double value=0;.)
+	Expression<ref value>		(.System.Console.WriteLine("Resultado: {0}",value);.)
+	.
+
+Expression<ref double result> =			(.double result1=0,result2=0;.)
+	Term<ref result1>
+	{    "+"Term<ref result2>		(.result1+=result2;.)
+	   | "-"Term<ref result2>		(.result1-=result2;.)
+	}								(.result=result1;.)
+	.
+
+Term<ref double result>=				(.double result1=0,result2=0;.)
+	Factor<ref result1>
+	{    "*"Factor<ref result2>	(.result1*=result2;.)
+	   | "/"Factor<ref result2>	(.result1/=result2;.)
+	}							(.result=result1;.)
+	.
+
+
+Factor<ref double result> =		(.double sign=1;.)
+	["-"						(.sign = -1;.)
+	]
+	(Number<ref result>
+	 |"("Expression<ref result>")"
+	)							(.result*=sign;.)
+	.
+
+Number<ref double result> =	
+	(number				
+	|decnumber)(.result = double.Parse(LastToken.Value);.)
+	.
+END Double

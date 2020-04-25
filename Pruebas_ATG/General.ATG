@@ -1,0 +1,46 @@
+COMPILER Ejemplo
+(.
+/*--------------Scanner Specification----------*/
+.)
+
+CHARACTERS
+letterLo = "a".."z".
+letterUp = "A".."Z".
+letter = letterLo + letterUp.
+vowels = "aeiou" + "AEIOU".
+consonants = letter - vowels.
+digit = "0123456789".
+sign = "+" + "-".
+hexdigit = digit+"ABCDEF".
+tab = CHR(9).
+eol = CHR(10).
+space = CHR(32).
+whitespace = CHR(13)+eol+tab+space.
+
+KEYWORDS
+if="if".
+while="while".
+switch = "switch".
+do = "do".
+for = "for".
+exit = "exit".
+class = "class".
+import = "import".
+from = "from".
+try = "try".
+except = "except".
+lambda = "lambda".
+
+TOKENS
+string = letter{letter} EXCEPT KEYWORDS.
+name = letterUp(letterLo){letterLo} EXCEPT KEYWORDS.
+var = letter{letter|digit}digit EXCEPT KEYWORDS.
+signInt = [sign]digit{digit}.
+int = digit{digit}.
+float = digit{digit}"."digit{digit}.
+hexnumber = hexdigit{hexdigit}"(H)" EXCEPT KEYWORDS.
+space = whitespace{whitespace}.
+
+PRODUCTIONS
+
+END Ejemplo

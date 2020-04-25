@@ -1,0 +1,63 @@
+COMPILER Aritmetica    
+	
+(.
+/*--------------Scanner Especification----------*/
+.)
+
+CHARACTERS 
+
+upletter = 'A' .. 'Z'.
+downletter = 'a' .. 'z'.
+letter = "abcdefghijklmnopqrstuvwxyz" + upletter + downletter. 
+digit = "0123456789" .
+hexdigit = digit + "ABCDEF".
+hexterm = 'H'.
+tab = CHR(9).
+eol = CHR(10).
+whitespace = CHR(13)+eol+tab+CHR(13).
+sign ='+'+'-'.
+
+KEYWORDS
+
+while = "while".
+do = "do".
+switch = "switch" .
+if = "if"  .
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+hexnumber = hexdigit{hexdigit}hexterm EXCEPT KEYWORDS.
+number = digit{digit}.
+signnumber = [sign]digit{digit}.
+whitetoken = whitespace{whitespace}
+
+PRODUCTIONS
+
+Expr= {Stat (";")}".".
+
+Stat = 							(.int value;.)
+	Expression< ref value>		(.System.Console.WriteLn(value.ToString());.)
+	.
+
+Expression<ref int result> =		(.int result1,result2;.)
+	Term< ref result1>
+	{    "+"Term< ref result2>		(.result1+=result2;.)
+	   | "-"Term< ref result2>		(.result1-=result2;.)
+	}							(.result=result1;.)
+	.
+
+Term<ref int result>=				(.int result1,result2;.)
+	Factor<ref result1>
+	{    "*"Factor<ref result2>	(.result1*=result2;.)
+	   | "/"Factor<ref result2>	(.result1/=result2;.)
+	}							(.result=result1;.)
+	.
+	
+Factor<ref int result> =	(.int signo=1;.)
+	["-"(.signo = -1;.)]
+	( Number<ref result> | "("Expression< ref result>")") (.result*=signo;.).
+	
+Number<ref int result> =  number (. result = int.Parse(lastToken.Value).).
+	.
+END Aritmetica

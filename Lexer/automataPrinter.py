@@ -1,7 +1,7 @@
 from PySimpleAutomata import automata_IO
 
-def printNFA(nodes, name_output):
-    file = open("cache/dotreptmp.dot","w") 
+def printAutomata(nodes, name_output):
+    file = open("Automata/dotreptmp.dot","w") 
 
     file.write('''digraph {
     fake0 [style=invisible]
@@ -24,7 +24,7 @@ def printNFA(nodes, name_output):
 
     file.close() 
 
-    nfa = automata_IO.nfa_dot_importer('cache/dotreptmp.dot')
+    nfa = automata_IO.nfa_dot_importer('Automata/dotreptmp.dot')
 
     name_toprint = ""
     for i in name_output:
@@ -39,4 +39,4 @@ def printNFA(nodes, name_output):
         else:
             name_toprint += i
 
-    automata_IO.nfa_to_dot(nfa, "output/" + str(name_toprint)[:len(name_toprint)-6] + "/" + str(name_toprint))
+    automata_IO.nfa_to_dot(nfa,"Automata/" + str(name_toprint))
