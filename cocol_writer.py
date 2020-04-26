@@ -1,3 +1,6 @@
+# cocol_writer.py
+# By: Luis Diego Fernandez
+
 class CocolWriter():
 
     def __init__(self, file_name = "test.py"):
