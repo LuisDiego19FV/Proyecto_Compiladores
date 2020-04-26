@@ -110,7 +110,7 @@ def exprToDecompTreeDFA(expr, reps = 0):
     for i in expr:
         last = len(i)-1
         if i[last] == "?":
-            newExpr.append("(" + i[0:last] + "|ε)")
+            newExpr.append("(" + i[:last] + "|ε)")
         else:
             newExpr.append(i)
 
@@ -127,7 +127,7 @@ def exprToDecompTreeDFA(expr, reps = 0):
         counter = 0
 
         for j in expresion:
-            if j in ("*","?", "|"):
+            if j in ("*", "|"):
                 tmpRoot.setValue(j)
                 rootIsSet = True
             elif j == ")":
@@ -502,113 +502,6 @@ def setPriorities(nodes, priority):
     for i in nodes:
         if i.getIsAcceptanceState():
             i.setPriority(priority)
-
-def compareTransition(transitions1, transitions2):
-    to_get = len(transitions1)
-    got = 0
-
-    for i in transitions1:
-        for j in transitions2:
-            if str(i) == str(j):
-                got += 1
-                break
-
-    return to_get == got
-
-def recursivIn(val, doubleArray):
-    for i in doubleArray:
-        for j in i:
-            if val == j:
-                return True
-
-    return False
-
-
-def recursivIndex(val, doubleArray):
-    for i in range(len(doubleArray)):
-        for j in doubleArray[i]:
-            if val == j:
-                return i
-    
-    return 0.5
-
-def nodesSort(nodes):
-    newNodes = [None] * len(nodes)
-    for i in nodes:
-        pos = int(i.getState()[1:])
-        newNodes[pos] = i
-
-    return newNodes
-
-def minimization(nodes):
-    
-    F = []
-    S = []
-
-    for i in nodes:
-        if i.getIsAcceptanceState():
-            F.append(i)
-        else:
-            S.append(i)
-
-    II = [S, F]
-    II_new = []
-
-    while II != II_new:
-
-        for G in II:
-            for i in range(len(G)):
-                
-                if recursivIn(G[i], II_new):
-                    continue
-
-                new_subgroup = [G[i]]
-                for j in range(i+1,len(G)):
-                    if compareTransition(G[i].getTransition(), G[j].getTransition()):
-                        new_subgroup.append(G[j])
-                
-                II_new.append(new_subgroup)
-
-        if II != II_new:
-            II = II_new
-            II_new = []
-
-    nodes_dfa = []
-    counter = 0
-
-    for i in II:
-
-        counter += 1
-        tmp_node = dfat("T" + str(counter))
-
-        for j in i:
-            if j.getState() == "T0":
-                counter -= 1
-                tmp_node.setState("T0")
-            if j.getIsAcceptanceState():
-                tmp_node.setIsAcceptanceState()
-        
-        for transition in i[0].getTransition():
-            to = recursivIndex(transition[0], II)
-            by = transition[1]
-            tmp_node.setTransition(to,by)
-
-        nodes_dfa.append(tmp_node)
-
-    for i in nodes_dfa:
-        new_transitions = []
-        for transition in i.getTransition():
-            to = nodes_dfa[transition[0]]
-            by = transition[1]
-            new_transitions.append((to,by))
-        
-        i.transitions = []
-        for j in new_transitions:
-            i.setTransition(j[0], j[1])
-
-    nodes_dfa = nodesSort(nodes_dfa)
-
-    return nodes_dfa
 
 def removeUseless(nodes):
 

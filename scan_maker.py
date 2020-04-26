@@ -71,6 +71,7 @@ else:
     except:
         # Caso de error en escritura
         sg.popup('Error en creacion de scanner (revisar definicion de compilador)')
+        exit()
     
     # Popup de creacion correcta
     sg.popup('Scanner creado correctamente \nArchivo creado/modificado: scanner.py')

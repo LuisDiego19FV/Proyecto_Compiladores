@@ -14,15 +14,13 @@ hexdigit = digit + "ABCDEF".
 hexterm = 'H'.
 tab = CHR(9).
 eol = CHR(10).
-whitespace = CHR(13)+eol+tab+CHR(13).
+whitespace = CHR(13)+eol+tab+CHR(32).
 sign ='+'+'-'.
 
 KEYWORDS
 
 while = "while".
 do = "do".
-switch = "switch" .
-if = "if"  .
 
 TOKENS
 
@@ -30,7 +28,7 @@ ident = letter{letter|digit} EXCEPT KEYWORDS.
 hexnumber = hexdigit{hexdigit}hexterm EXCEPT KEYWORDS.
 number = digit{digit}.
 signnumber = [sign]digit{digit}.
-whitetoken = whitespace{whitespace}
+whitetoken = whitespace{whitespace}.
 
 PRODUCTIONS
 

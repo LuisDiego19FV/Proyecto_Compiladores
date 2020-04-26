@@ -2,13 +2,10 @@ COMPILER Aritmetica
 
 CHARACTERS 
 
-letter = A..Z + a..z. 
-digit = "0123456789".
-hexdigit = digit+"ABCDEF".
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789" .
 tab = CHR(9).
 eol = CHR(10).
-space = CHR(32).
-whitespace = CHR(13)+eol+tab+space.
 
 KEYWORDS
 
@@ -21,8 +18,6 @@ TOKENS
 
 ident = letter{letter|digit} EXCEPT KEYWORDS.
 number = digit{digit}.
-hexnumber = hexdigit{hexdigit}"(H)".
-whitetoken = whitespace{whitespace}
 
 PRODUCTIONS
 
