@@ -1,257 +1,257 @@
 digraph {
 	fake0 [style=invisible]
-	T10
-	T11
-	T23
-	T47
-	T32
-	T41
-	T49
-	T67 [shape=doublecircle]
 	T70
-	T20
-	T36 [shape=doublecircle]
-	T62
-	T39
-	T26
-	T46
-	T18 [shape=doublecircle]
-	T17
-	T56 [shape=doublecircle]
-	T48
-	T58 [shape=doublecircle]
-	T60
-	T14
-	T29
-	T38
-	T8
-	T54
 	T63
-	T27
-	T35
-	T16
+	T19
 	T21 [shape=doublecircle]
-	T50
-	T34
-	T59 [shape=doublecircle]
-	T24
-	T57
-	T44
-	T45 [shape=doublecircle]
-	T64 [shape=doublecircle]
+	T38
+	T43 [shape=doublecircle]
+	T47
 	T66
 	T71 [shape=doublecircle]
-	T15
-	T0 [root=true]
-	T13
-	T7
-	T22
-	T28
-	T9
-	T37
-	T19
-	T40 [shape=doublecircle]
-	T43 [shape=doublecircle]
-	T69 [shape=doublecircle]
-	T72 [shape=doublecircle]
-	T65 [shape=doublecircle]
-	T51 [shape=doublecircle]
 	T30
-	T52
-	T25 [shape=doublecircle]
+	T13
+	T16
+	T7
+	T10
+	T0 [root=true]
+	T17
 	T68
-	T42
-	T12 [shape=doublecircle]
-	T55
 	T31 [shape=doublecircle]
+	T55
+	T39
+	T24
+	T41
+	T52
+	T18 [shape=doublecircle]
+	T29
+	T72 [shape=doublecircle]
 	T53
-	T33
+	T36 [shape=doublecircle]
+	T64 [shape=doublecircle]
+	T20
+	T45 [shape=doublecircle]
+	T12 [shape=doublecircle]
+	T15
+	T44
+	T60
+	T11
+	T14
+	T32
+	T25 [shape=doublecircle]
+	T9
 	T61 [shape=doublecircle]
+	T28
+	T37
+	T59 [shape=doublecircle]
+	T35
+	T26
+	T48
+	T57
+	T67 [shape=doublecircle]
+	T23
+	T51 [shape=doublecircle]
+	T42
+	T58 [shape=doublecircle]
+	T49
+	T33
+	T46
+	T34
+	T69 [shape=doublecircle]
+	T56 [shape=doublecircle]
+	T22
+	T8
+	T54
+	T27
+	T50
+	T62
+	T40 [shape=doublecircle]
+	T65 [shape=doublecircle]
 	fake0 -> T0 [style=bold]
-	T0 -> T72 [label=l]
-	T0 -> T7 [label=l]
 	T0 -> T68 [label=l]
-	T0 -> T13 [label=e]
+	T0 -> T7 [label=l]
+	T0 -> T72 [label=l]
+	T0 -> T68 [label=e]
 	T0 -> T37 [label=e]
 	T0 -> T72 [label=e]
-	T0 -> T68 [label=e]
-	T0 -> T72 [label=t]
+	T0 -> T13 [label=e]
 	T0 -> T68 [label=t]
+	T0 -> T72 [label=t]
 	T0 -> T19 [label=t]
-	T0 -> T41 [label=f]
-	T0 -> T22 [label=f]
 	T0 -> T68 [label=f]
+	T0 -> T41 [label=f]
 	T0 -> T72 [label=f]
-	T0 -> T57 [label=i]
-	T0 -> T72 [label=i]
+	T0 -> T22 [label=f]
 	T0 -> T68 [label=i]
+	T0 -> T72 [label=i]
 	T0 -> T26 [label=i]
-	T0 -> T72 [label=c]
+	T0 -> T57 [label=i]
 	T0 -> T68 [label=c]
 	T0 -> T32 [label=c]
+	T0 -> T72 [label=c]
 	T0 -> T44 [label=d]
 	T0 -> T72 [label=d]
 	T0 -> T68 [label=d]
+	T0 -> T68 [label=s]
 	T0 -> T46 [label=s]
 	T0 -> T72 [label=s]
-	T0 -> T68 [label=s]
-	T0 -> T52 [label=w]
-	T0 -> T72 [label=w]
 	T0 -> T68 [label=w]
+	T0 -> T72 [label=w]
+	T0 -> T52 [label=w]
 	T0 -> T59 [label="
 "]
 	T0 -> T59 [label="	"]
 	T0 -> T59 [label=""]
-	T0 -> T65 [label=0]
 	T0 -> T60 [label=0]
 	T0 -> T62 [label=0]
-	T0 -> T65 [label=1]
+	T0 -> T65 [label=0]
 	T0 -> T60 [label=1]
 	T0 -> T62 [label=1]
-	T0 -> T65 [label=2]
+	T0 -> T65 [label=1]
 	T0 -> T60 [label=2]
 	T0 -> T62 [label=2]
-	T0 -> T65 [label=3]
+	T0 -> T65 [label=2]
 	T0 -> T60 [label=3]
 	T0 -> T62 [label=3]
-	T0 -> T65 [label=4]
+	T0 -> T65 [label=3]
 	T0 -> T60 [label=4]
 	T0 -> T62 [label=4]
-	T0 -> T65 [label=5]
+	T0 -> T65 [label=4]
 	T0 -> T60 [label=5]
 	T0 -> T62 [label=5]
-	T0 -> T65 [label=6]
+	T0 -> T65 [label=5]
 	T0 -> T60 [label=6]
 	T0 -> T62 [label=6]
-	T0 -> T65 [label=7]
+	T0 -> T65 [label=6]
 	T0 -> T60 [label=7]
 	T0 -> T62 [label=7]
-	T0 -> T65 [label=8]
+	T0 -> T65 [label=7]
 	T0 -> T60 [label=8]
 	T0 -> T62 [label=8]
-	T0 -> T65 [label=9]
+	T0 -> T65 [label=8]
 	T0 -> T60 [label=9]
 	T0 -> T62 [label=9]
-	T0 -> T70 [label=A]
-	T0 -> T72 [label=A]
-	T0 -> T60 [label=A]
+	T0 -> T65 [label=9]
 	T0 -> T68 [label=A]
-	T0 -> T70 [label=B]
-	T0 -> T72 [label=B]
-	T0 -> T60 [label=B]
+	T0 -> T70 [label=A]
+	T0 -> T60 [label=A]
+	T0 -> T72 [label=A]
 	T0 -> T68 [label=B]
-	T0 -> T70 [label=C]
-	T0 -> T72 [label=C]
-	T0 -> T60 [label=C]
+	T0 -> T70 [label=B]
+	T0 -> T60 [label=B]
+	T0 -> T72 [label=B]
 	T0 -> T68 [label=C]
-	T0 -> T70 [label=D]
-	T0 -> T72 [label=D]
-	T0 -> T60 [label=D]
+	T0 -> T70 [label=C]
+	T0 -> T60 [label=C]
+	T0 -> T72 [label=C]
 	T0 -> T68 [label=D]
-	T0 -> T70 [label=E]
-	T0 -> T72 [label=E]
-	T0 -> T60 [label=E]
+	T0 -> T70 [label=D]
+	T0 -> T60 [label=D]
+	T0 -> T72 [label=D]
 	T0 -> T68 [label=E]
-	T0 -> T70 [label=F]
-	T0 -> T72 [label=F]
-	T0 -> T60 [label=F]
+	T0 -> T70 [label=E]
+	T0 -> T60 [label=E]
+	T0 -> T72 [label=E]
 	T0 -> T68 [label=F]
+	T0 -> T70 [label=F]
+	T0 -> T60 [label=F]
+	T0 -> T72 [label=F]
 	T0 -> T66 [label="+"]
 	T0 -> T66 [label="-"]
-	T0 -> T72 [label=a]
 	T0 -> T68 [label=a]
-	T0 -> T72 [label=b]
+	T0 -> T72 [label=a]
 	T0 -> T68 [label=b]
-	T0 -> T72 [label=g]
+	T0 -> T72 [label=b]
 	T0 -> T68 [label=g]
-	T0 -> T72 [label=h]
+	T0 -> T72 [label=g]
 	T0 -> T68 [label=h]
-	T0 -> T72 [label=j]
+	T0 -> T72 [label=h]
 	T0 -> T68 [label=j]
-	T0 -> T72 [label=k]
+	T0 -> T72 [label=j]
 	T0 -> T68 [label=k]
-	T0 -> T72 [label=m]
+	T0 -> T72 [label=k]
 	T0 -> T68 [label=m]
-	T0 -> T72 [label=n]
+	T0 -> T72 [label=m]
 	T0 -> T68 [label=n]
-	T0 -> T72 [label=o]
+	T0 -> T72 [label=n]
 	T0 -> T68 [label=o]
-	T0 -> T72 [label=p]
+	T0 -> T72 [label=o]
 	T0 -> T68 [label=p]
-	T0 -> T72 [label=q]
+	T0 -> T72 [label=p]
 	T0 -> T68 [label=q]
-	T0 -> T72 [label=r]
+	T0 -> T72 [label=q]
 	T0 -> T68 [label=r]
-	T0 -> T72 [label=u]
+	T0 -> T72 [label=r]
 	T0 -> T68 [label=u]
-	T0 -> T72 [label=v]
+	T0 -> T72 [label=u]
 	T0 -> T68 [label=v]
-	T0 -> T72 [label=x]
+	T0 -> T72 [label=v]
 	T0 -> T68 [label=x]
-	T0 -> T72 [label=y]
+	T0 -> T72 [label=x]
 	T0 -> T68 [label=y]
-	T0 -> T72 [label=z]
+	T0 -> T72 [label=y]
 	T0 -> T68 [label=z]
+	T0 -> T72 [label=z]
+	T0 -> T68 [label=G]
 	T0 -> T70 [label=G]
 	T0 -> T72 [label=G]
-	T0 -> T68 [label=G]
+	T0 -> T68 [label=H]
 	T0 -> T70 [label=H]
 	T0 -> T72 [label=H]
-	T0 -> T68 [label=H]
+	T0 -> T68 [label=I]
 	T0 -> T70 [label=I]
 	T0 -> T72 [label=I]
-	T0 -> T68 [label=I]
+	T0 -> T68 [label=J]
 	T0 -> T70 [label=J]
 	T0 -> T72 [label=J]
-	T0 -> T68 [label=J]
+	T0 -> T68 [label=K]
 	T0 -> T70 [label=K]
 	T0 -> T72 [label=K]
-	T0 -> T68 [label=K]
+	T0 -> T68 [label=L]
 	T0 -> T70 [label=L]
 	T0 -> T72 [label=L]
-	T0 -> T68 [label=L]
+	T0 -> T68 [label=M]
 	T0 -> T70 [label=M]
 	T0 -> T72 [label=M]
-	T0 -> T68 [label=M]
+	T0 -> T68 [label=N]
 	T0 -> T70 [label=N]
 	T0 -> T72 [label=N]
-	T0 -> T68 [label=N]
+	T0 -> T68 [label=O]
 	T0 -> T70 [label=O]
 	T0 -> T72 [label=O]
-	T0 -> T68 [label=O]
+	T0 -> T68 [label=P]
 	T0 -> T70 [label=P]
 	T0 -> T72 [label=P]
-	T0 -> T68 [label=P]
+	T0 -> T68 [label=Q]
 	T0 -> T70 [label=Q]
 	T0 -> T72 [label=Q]
-	T0 -> T68 [label=Q]
+	T0 -> T68 [label=R]
 	T0 -> T70 [label=R]
 	T0 -> T72 [label=R]
-	T0 -> T68 [label=R]
+	T0 -> T68 [label=S]
 	T0 -> T70 [label=S]
 	T0 -> T72 [label=S]
-	T0 -> T68 [label=S]
+	T0 -> T68 [label=T]
 	T0 -> T70 [label=T]
 	T0 -> T72 [label=T]
-	T0 -> T68 [label=T]
+	T0 -> T68 [label=U]
 	T0 -> T70 [label=U]
 	T0 -> T72 [label=U]
-	T0 -> T68 [label=U]
+	T0 -> T68 [label=V]
 	T0 -> T70 [label=V]
 	T0 -> T72 [label=V]
-	T0 -> T68 [label=V]
+	T0 -> T68 [label=W]
 	T0 -> T70 [label=W]
 	T0 -> T72 [label=W]
-	T0 -> T68 [label=W]
+	T0 -> T68 [label=X]
 	T0 -> T70 [label=X]
 	T0 -> T72 [label=X]
-	T0 -> T68 [label=X]
+	T0 -> T68 [label=Y]
 	T0 -> T70 [label=Y]
 	T0 -> T72 [label=Y]
-	T0 -> T68 [label=Y]
+	T0 -> T68 [label=Z]
 	T0 -> T70 [label=Z]
 	T0 -> T72 [label=Z]
-	T0 -> T68 [label=Z]
 	T7 -> T8 [label=a]
 	T8 -> T9 [label=m]
 	T9 -> T10 [label=b]
