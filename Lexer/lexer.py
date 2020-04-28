@@ -503,6 +503,47 @@ def setPriorities(nodes, priority):
         if i.getIsAcceptanceState():
             i.setPriority(priority)
 
+# Adds new base for a conjunction model of nodes
+def noFirstRecursion(nodes):
+    
+    # Repetitions variables
+    repetition = False
+    rep_chars = []
+
+    transitions =  nodes[0].getTransition()
+    for i in transitions:
+        if i[0].getState() == "T0":
+            rep_chars.append(i[1])
+            repetition = True
+
+    # Exit
+    if not repetition:
+        return nodes
+
+    # New base
+    extra_node = dfat("T" + str(len(nodes)))
+
+    # Add transitions from base
+    for i in rep_chars:
+        extra_node.setTransition(nodes[0],i)
+
+    # Add transitions to next nodes to skip old base
+    for i in transitions:
+        if i[0].getState() != "T0":
+            extra_node.setTransition(i[0],i[1])
+
+    new_nodes = [extra_node] + nodes
+
+    # Rename nodes
+    counter = 0
+    for i in new_nodes:
+        i.setState("T" + str(counter))
+        counter += 1
+
+    return new_nodes
+
+
+# removes useless nodes
 def removeUseless(nodes):
 
     new_nodes = []
@@ -553,6 +594,9 @@ def regexToDFA(regex, tag, priority):
     # Paso 3: DFA
     nodes_dfa = rootToDFA(rootDFA, alphabet)
     nodes_dfa = removeUseless(nodes_dfa)
+    nodes_dfa = noFirstRecursion(nodes_dfa)
+
+    # Paso 4: Tags y priotidades
     setTags(nodes_dfa, tag)
     setPriorities(nodes_dfa, priority)
 

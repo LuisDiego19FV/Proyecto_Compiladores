@@ -226,7 +226,7 @@ class CocolReader():
                 elif i == "[":
                     components.append("(")
                 elif i == "]":
-                    components.append(")*")
+                    components.append(")")
                 elif i == "|":
                     components.append("|")
                 

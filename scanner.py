@@ -28,26 +28,65 @@ class Scanner():
     def process_tokens(self):
         
         # AUTOMATAS TOKENS
-        nodes0 = lex.regexToDFA("(do)","do",1.1)
+        nodes0 = lex.regexToDFA("(lambda)","lambda",1.1)
         self.separateDFAs.append(nodes0)
         
-        nodes1 = lex.regexToDFA("(while)","while",1.2)
+        nodes1 = lex.regexToDFA("(except)","except",1.2)
         self.separateDFAs.append(nodes1)
         
-        nodes2 = lex.regexToDFA("(\r|\n|\t| )((\r|\n|\t| ))*","whitetoken",0.1)
+        nodes2 = lex.regexToDFA("(try)","try",1.3)
         self.separateDFAs.append(nodes2)
         
-        nodes3 = lex.regexToDFA("((+|-))*(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","signnumber",0.2)
+        nodes3 = lex.regexToDFA("(from)","from",1.4)
         self.separateDFAs.append(nodes3)
         
-        nodes4 = lex.regexToDFA("(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","number",0.3)
+        nodes4 = lex.regexToDFA("(import)","import",1.5)
         self.separateDFAs.append(nodes4)
         
-        nodes5 = lex.regexToDFA("(0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F)((0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F))*(H)","hexnumber",2.4)
+        nodes5 = lex.regexToDFA("(class)","class",1.6)
         self.separateDFAs.append(nodes5)
         
-        nodes6 = lex.regexToDFA("(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*","ident",2.5)
+        nodes6 = lex.regexToDFA("(exit)","exit",1.7)
         self.separateDFAs.append(nodes6)
+        
+        nodes7 = lex.regexToDFA("(for)","for",1.8)
+        self.separateDFAs.append(nodes7)
+        
+        nodes8 = lex.regexToDFA("(do)","do",1.9)
+        self.separateDFAs.append(nodes8)
+        
+        nodes9 = lex.regexToDFA("(switch)","switch",1.91)
+        self.separateDFAs.append(nodes9)
+        
+        nodes10 = lex.regexToDFA("(while)","while",1.92)
+        self.separateDFAs.append(nodes10)
+        
+        nodes11 = lex.regexToDFA("(if)","if",1.93)
+        self.separateDFAs.append(nodes11)
+        
+        nodes12 = lex.regexToDFA("(\r|\n|\t| )((\r|\n|\t| ))*","space",0.1)
+        self.separateDFAs.append(nodes12)
+        
+        nodes13 = lex.regexToDFA("(0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F)((0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F))*((H))","hexnumber",2.2)
+        self.separateDFAs.append(nodes13)
+        
+        nodes14 = lex.regexToDFA("(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*(.)(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","float",0.3)
+        self.separateDFAs.append(nodes14)
+        
+        nodes15 = lex.regexToDFA("((0|1|2|3|4|5|6|7|8|9))*(0|1|2|3|4|5|6|7|8|9)","int",0.4)
+        self.separateDFAs.append(nodes15)
+        
+        nodes16 = lex.regexToDFA("((+|-))(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","signInt",0.5)
+        self.separateDFAs.append(nodes16)
+        
+        nodes17 = lex.regexToDFA("(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)((a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)|(0|1|2|3|4|5|6|7|8|9))*(0|1|2|3|4|5|6|7|8|9)","var",2.6)
+        self.separateDFAs.append(nodes17)
+        
+        nodes18 = lex.regexToDFA("(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z))*","name",2.7)
+        self.separateDFAs.append(nodes18)
+        
+        nodes19 = lex.regexToDFA("(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)((a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z))*","string",2.8)
+        self.separateDFAs.append(nodes19)
         
         # MAIN DFA
         nodes = nodes0
