@@ -3,12 +3,16 @@
 
 class CocolWriter():
 
-    def __init__(self, file_name = "test.py"):
+    def __init__(self, compiler_name = "Compiler", file_name_scanner = "my_scanner.py", file_name_parser = "my_parser.py"):
         # file specifications
-        self.file_name = file_name
+        self.compiler_name = compiler_name
+        self.file_name_scanner = file_name_scanner
+        self.file_name_parser = file_name_parser
         self.keywords= []
         self.tokens = []
         self.ignore_chars = ""
+        self.productions = []
+        self.ptokens = []
 
     def setKeywords(self, keywords):
         self.keywords = keywords
@@ -19,193 +23,278 @@ class CocolWriter():
     def setIgnoreChars(self, chars):
         self.ignore_chars = chars
 
-    def startWriting(self):
-        file = open(self.file_name, "w")
+    def setProductions(self, productions):
+        self.productions = productions
+
+    def setProductionsTokens(self, ptokens):
+        self.ptokens = ptokens
+
+    def startWritingScanner(self):
+        file = open("Templates/scanner_template_1.txt", "r")
+        part1 = file.readlines()
+        file.close()
+
+        file = open("Templates/scanner_template_2.txt", "r")
+        part2 = file.readlines()
+        file.close()
+
+        file = open(self.file_name_scanner, "w")
+
+        for i in part1:
+            if "self.ignore_chars =" in i and self.ignore_chars != "":
+                file.write("        self.ignore_chars = " + str(self.ignore_chars) )
+            else:
+                file.write(i)
+
+        # Write tokens priority 0
+        counter = 0
+        priority = 0
+        tokens = self.tokens[::-1]
+        for i in tokens:
+
+            if i[2] == 2:
+                continue
+
+            priority += 1
+
+            # White spaces restriccions
+            regex = i[1].replace("\n", "\\n")
+            regex = regex.replace("\r", "\\r")
+            regex = regex.replace("\t", "\\t")
+
+            # Write token
+            file.write('''
+        nodes''' + str(counter) + \
+            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority)  + ''')
+        self.separateDFAs.append(nodes''' + str(counter) + ''')
+        ''')
+            counter += 1
+
+        # Write keywords
+        keys = self.keywords[::-1]
+        for i in keys:
+
+            priority += 1
+
+            # White spaces restriccions
+            regex = i[1].replace("\n", "\\n")
+            regex = regex.replace("\r", "\\r")
+            regex = regex.replace("\t", "\\t")
+
+            # Write token
+            file.write('''
+        nodes''' + str(counter) + \
+            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority) + ''')
+        self.separateDFAs.append(nodes''' + str(counter) + ''')
+''')
+            counter += 1
+
+        # Write tokens priority 2
+        for i in tokens:
+
+            if i[2] == 0:
+                continue
+
+            priority += 1
+
+            # White spaces restriccions
+            regex = i[1].replace("\n", "\\n")
+            regex = regex.replace("\r", "\\r")
+            regex = regex.replace("\t", "\\t")
+
+            # Write token
+            file.write('''
+        nodes''' + str(counter) + \
+            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority)  + ''')
+        self.separateDFAs.append(nodes''' + str(counter) + ''')
+''')
+            counter += 1
+        
+        ptokens = self.ptokens[::-1]
+
+        # Write tokens declare in productions
+        for i in ptokens:
+
+            priority += 1
+
+            # White spaces restriccions
+            regex = i[1].replace("\n", "\\n")
+            regex = regex.replace("\r", "\\r")
+            regex = regex.replace("\t", "\\t")
+
+            # Write token
+            file.write('''
+        nodes''' + str(counter) + \
+            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority)  + ''')
+        self.separateDFAs.append(nodes''' + str(counter) + ''')
+''')
+            counter += 1
+
+        for i in part2:
+            file.write(i)
+
+    def startWritingParser(self):
+        file = open(self.file_name_parser, "w")
+        scanner = self.file_name_scanner
+        scanner = scanner[:scanner.index(".")]
 
         file.write(
 '''import Lexer.lexer as lex
 import Lexer.automataPrinter as autPrint
+from ''' + scanner + ''' import Scanner as scanner 
 
-class Scanner():
+class Parser():
 
     def __init__(self, filename):
-
-        # COMPILER VARIABLES
-        self.tag = ""
         self.filename = filename
-        self.pointer = 0
-        self.buffer = ""
-        self.end_buffer = False
-        self.ignore_chars = "''' + str(self.ignore_chars) + '''"
+        self.sc = scanner(filename)
 
-        # ADD FILE TO BUFFER 
-        file = open(filename)
+        self.t = self.sc.scan()
+        self.la = self.t
 
-        for i in file:
-            self.buffer += i
+        self._EOF = 0
+    ''')
+        tokens = self.tokens[::-1]
+        keywords = self.keywords[::-1]
+        ptokens = self.ptokens[::-1]
+        priority = 0
 
-        # AUTOMATA VARIABLES
-        self.separateDFAs = []
-        self.mainDFA = None
+        expected = []
 
-        self.process_tokens()
+        # Write tokens priority 0
+        for i in tokens:
+            if i[2] == 2:
+                continue
 
-    def process_tokens(self):
-        
-        # AUTOMATAS TOKENS''')
+            priority += 1
+
+            file.write('''
+        self._''' + str(i[0]) + ''' = ''' + str(priority))
+
+            expected.append((priority,str(i[0])))
 
         # Write keywords
-        counter = 0
-        priorityAdder = 0
-        keys = self.keywords[::-1]
-        for i in keys:
+        for i in keywords:
+            priority += 1
 
-            # Priority
-            priorityAdder += 1
-            if priorityAdder % 10 == 0:
-                priorityAdder = int("9" * (len(str(priorityAdder)) - 1) + "1")
-
-            # White spaces restriccions
-            regex = i[1].replace("\n", "\\n")
-            regex = regex.replace("\r", "\\r")
-            regex = regex.replace("\t", "\\t")
-
-            # Write token
             file.write('''
-        nodes''' + str(counter) + \
-            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(i[2]) + '''.''' 
-            + str(priorityAdder) + ''')
-        self.separateDFAs.append(nodes''' + str(counter) + ''')
-        ''')
-            counter += 1
+        self._''' + str(i[0]) + ''' = ''' + str(priority))
 
-        # Write tokens
-        priorityAdder = 0
-        tokens = self.tokens[::-1]
+            expected.append((priority,str(i[0])))
+
+        # Write tokens priority 2
         for i in tokens:
+            if i[2] == 0:
+                continue
 
-            # Priority
-            priorityAdder += 1
-            if priorityAdder % 10 == 0:
-                priorityAdder = int("9" * (len(str(priorityAdder)) - 1) + "1")
+            priority += 1
 
-            # White spaces restriccions
-            regex = i[1].replace("\n", "\\n")
-            regex = regex.replace("\r", "\\r")
-            regex = regex.replace("\t", "\\t")
-
-            # Write token
             file.write('''
-        nodes''' + str(counter) + \
-            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(i[2]) + '''.''' 
-            + str(priorityAdder) + ''')
-        self.separateDFAs.append(nodes''' + str(counter) + ''')
-        ''')
-            counter += 1
+        self._''' + str(i[0]) + ''' = ''' + str(priority))
+
+            expected.append((priority,str(i[0])))
+
+        # Write ptoken
+        for i in ptokens:
+            priority += 1
+
+            file.write('''
+        self._''' + str(i[0]) + ''' = ''' + str(priority))
+
+            expected.append((priority,str(i[1])))
 
         file.write('''
-        # MAIN DFA
-        nodes = nodes0
-        counter = 0
-        for i in self.separateDFAs:
-            transitions = i[0].getTransition()
-            for j in range(len(transitions)):
-                to = transitions[j][0]
-                by = transitions[j][1]
-                nodes[0].setTransition(to, by)
-            
-            nodes += i[1:]
+        self.maxT = ''' + str(priority + 1) + '''
 
-        counter = 0
-        for node in nodes:
-            node.setState("T" + str(counter))
-            counter += 1
+        self.''' + str(self.compiler_name) + "()" + '''
+        ''')
 
-        autPrint.printAutomata(nodes,"test")
+        # Write productions
+        for i in self.productions:
+            file.write(''' 
+
+    def ''' + str(i[0]) + '''(self''')
+            # Write parameters
+            to_return = ""
+            for j in i[1]:
+                param = str(j)
+                if 'ref ' in param:
+                    param = param.replace('ref ','')
+                    to_return += "," + param
+
+                file.write(", " + param)
         
-        self.mainDFA = nodes
+            file.write("):\n")
 
-    # COMPONER
-    def scan(self):
-        # TOKEN VARIABLES
-        token = ""
-        tokens = []
-        characters = self.buffer[self.pointer: self.pointer + 1]
-        tmp_token = lex.simulateDFA(characters, self.mainDFA)
+            # Write the production
+            tabs = 2
+            for j in i[2]:
 
-        # COUNTER
-        counter = self.pointer
+                if j == "{":
+                    file.write("    " * tabs + "while(True):\n")
+                    tabs += 1
+                elif j == "[":
+                    file.write("    " * tabs + "if(True):\n")
+                    tabs += 1
+                elif j == "if":
+                    file.write("    " * tabs + "if(True):\n")
+                    tabs += 1
+                elif "if(" in j or "while(" in j:
+                    file.write("    " * tabs + j + ":\n")
+                    tabs += 1
+                elif j == "ENDW" or j == "ENDI":
+                    tabs -= 1
+                    continue
+                elif j[:2] == "(.":
+                    file.write("    " * tabs + j[2:][:len(j)-4] + "\n")
+                elif j in ('(', ')'):
+                    continue
+                else:
+                    file.write("    " * tabs + j + '\n')
 
-        # IMIDATE END OF BUFFER
-        if self.end_buffer:
-            return (0 ,"end_token")
-
-        # IMIDATE NOT A TOKEN
-        if tmp_token == "not_a_token":
-            if self.pointer >= len(self.buffer):
-                return (1 ,"end_token")
-            else:
-                self.pointer += 1
-                return (characters, "not_a_token")
-
-        tokens.append(tmp_token)
-
-        # GET TOKEN UNTIL NOT A TOKEN
-        while tmp_token != "not_a_token" and counter <= len(self.buffer):
-            counter += 1
-            characters = self.buffer[self.pointer: counter]
-
-            # remove unecessary chars
-            for i in self.ignore_chars:
-                characters = characters.replace(i,'')
-
-            tmp_token = lex.simulateDFA(characters, self.mainDFA)
-
-            if tmp_token != "not_a_token":
-                tokens.append(tmp_token)
-
-        # GET LAST TOKEN
-        tokens = tokens[::-1]
-        for i in tokens:
-            if i != "keep_going":
-                token = i
-                break
-            else:
-                counter -= 1
-
-        # IF NOT TOKEN FOUND
-        if token == "":
-            characters = self.buffer[self.pointer: counter + len(tokens) - 1]
-            self.pointer = counter + len(tokens) - 1
-            return (characters, "not_a_token")
+            # Write return
+            if to_return != "":
+                file.write("        return(" + to_return[1:] + ")\n")
         
-        # TOKEN LENGHT CONDITION
-        if self.pointer == counter - 1:
-            characters = self.buffer[self.pointer: counter]
-
-            # remove unecessary chars
-            for i in self.ignore_chars:
-                characters = characters.replace(i,'')
-
-            self.pointer = counter
-        else:
-            characters = self.buffer[self.pointer: counter - 1]
-
-            # remove unecessary chars
-            for i in self.ignore_chars:
-                characters = characters.replace(i,'')
-
-            self.pointer = counter - 1
-
-        # END CONDITION
-        if self.pointer == len(self.buffer):
-            self.end_buffer = True
-
-        return (characters, token)
+        # Write funcitons Get & Expect
+        file.write('''
     
-    # BUFFER RESET
-    def reset_buffer(self):
-        self.end_buffer = False
+    def Get(self):
+        self.t = self.la
+        self.la = self.sc.scan()
+        if self.la.get_tok_type() < 0 or self.la.get_tok_type() > self.maxT:
+            self.la = self.t
 
-    ''')
+    def Expect(self, expected):
+        if self.la.get_tok_type() == expected:
+            self.Get()
+        else:
+            self.SymError(expected)   ''')
+
+        # Write funciton SymError
+        file.write(''' 
+
+    def SymError(self, expected):
+        s = "Other"
+
+        if expected == 0:
+            s = "EOF"
+        ''')
+
+        for i in expected:
+
+            file.write('''
+        elif expected == ''' + str(i[0]) + ''':
+            s = "''' + str(i[1]) + "\"\n")
+        
+        file.write('''
+        print("Error: Expected " + s)
+        print("Last token : " + str(self.t))
+        print("Last Look-a: " + str(self.la))
+        print("Scanner Pointer: " + str(self.sc.pointer))
+        exit()
+        ''')
+
+
+                
         

@@ -2,9 +2,11 @@ import copy
 try:
     from nodes import DecompositionTreeDFA as dfadt
     from nodes import DFATree as dfat
+    from nodes import Token as cls_token
 except:
     from Lexer.nodes import DecompositionTreeDFA as dfadt
     from Lexer.nodes import DFATree as dfat
+    from Lexer.nodes import Token as cls_token
 
 # regexToExpr(String)
 # Separa cada elemento del regex en sus componentes y operadores
@@ -503,47 +505,6 @@ def setPriorities(nodes, priority):
         if i.getIsAcceptanceState():
             i.setPriority(priority)
 
-# Adds new base for a conjunction model of nodes
-def noFirstRecursion(nodes):
-    
-    # Repetitions variables
-    repetition = False
-    rep_chars = []
-
-    transitions =  nodes[0].getTransition()
-    for i in transitions:
-        if i[0].getState() == "T0":
-            rep_chars.append(i[1])
-            repetition = True
-
-    # Exit
-    if not repetition:
-        return nodes
-
-    # New base
-    extra_node = dfat("T" + str(len(nodes)))
-
-    # Add transitions from base
-    for i in rep_chars:
-        extra_node.setTransition(nodes[0],i)
-
-    # Add transitions to next nodes to skip old base
-    for i in transitions:
-        if i[0].getState() != "T0":
-            extra_node.setTransition(i[0],i[1])
-
-    new_nodes = [extra_node] + nodes
-
-    # Rename nodes
-    counter = 0
-    for i in new_nodes:
-        i.setState("T" + str(counter))
-        counter += 1
-
-    return new_nodes
-
-
-# removes useless nodes
 def removeUseless(nodes):
 
     new_nodes = []
@@ -584,6 +545,26 @@ def removeUseless(nodes):
 
         
 def regexToDFA(regex, tag, priority):
+
+    #USING DUCT TAPE TO SAVE THE BOAT
+    if len(regex) == 1:
+        # Nodes
+        new_node0 = dfat("T0")
+        new_node1 = dfat("T1")
+        new_node1.setIsAcceptanceState()
+
+        # Nodes group
+        new_node0.setTransition(new_node1, regex)
+        nodes_dfa = [new_node0, new_node1]
+
+        # Details
+        setTags(nodes_dfa, tag)
+        setPriorities(nodes_dfa, priority)
+
+        return nodes_dfa
+
+    #BOAT SAVED CONTINUE
+
     # Paso 1: Leer regex
     expr = regexToExpr(regex)
     alphabet = exprToAlphabet(expr)
@@ -594,9 +575,6 @@ def regexToDFA(regex, tag, priority):
     # Paso 3: DFA
     nodes_dfa = rootToDFA(rootDFA, alphabet)
     nodes_dfa = removeUseless(nodes_dfa)
-    nodes_dfa = noFirstRecursion(nodes_dfa)
-
-    # Paso 4: Tags y priotidades
     setTags(nodes_dfa, tag)
     setPriorities(nodes_dfa, priority)
 
@@ -613,7 +591,7 @@ def simulateDFA(word, nodes):
 
     # caso que no pertenesca
     if s == [] or s == [0]:
-        return "not_a_token"
+        return cls_token("not_a_token", word, -1)
     
     # estados de aceptacion 
     acceptanceStates = []
@@ -623,18 +601,18 @@ def simulateDFA(word, nodes):
 
     # sorteo por prioridad
     if len(acceptanceStates) == 1:
-        return acceptanceStates[0].getTag()
+        return cls_token(acceptanceStates[0].getTag(), word, acceptanceStates[0].getPriority())
 
     elif len(acceptanceStates) > 1:
 
         singleState = None
-        priority = 99999
+        priority = 999999
         for i in acceptanceStates:
             if i.getPriority() < priority:
                 singleState = i
                 priority = i.getPriority()
 
-        return singleState.getTag()
+        return cls_token(singleState.getTag(), word, singleState.getPriority())
 
     # default return
-    return "keep_going"
+    return cls_token("keep_going", word, -2)

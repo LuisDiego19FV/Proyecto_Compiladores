@@ -1,0 +1,23 @@
+COMPILER Aritmetica    
+
+CHARACTERS 
+
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789".
+
+KEYWORDS
+
+if = "if".
+while = "while".
+
+TOKENS
+
+ident = letter{letter|digit}.
+number = digit{digit}.
+white = whitespace{whitespace}.
+
+PRODUCTIONS
+
+Aritmetica= {Stat ";" {white}}".".
+
+END Aritmetica

@@ -156,3 +156,30 @@ class DFATree():
         return '<DFA node> ' + str(self.state)
 
     
+class Token():
+
+    def __init__(self, name, val, tok_type):
+        self.name = name
+        self.val = val
+        self.tok_type = tok_type 
+
+    def set_name(self, name):
+        self.name = name
+        
+    def get_name(self):
+        return self.name
+
+    def set_val(self, val):
+        self.val = val
+    
+    def get_val(self):
+        return self.val
+    
+    def set_tok_type(self, tok_type):
+        self.tok_type = tok_type
+    
+    def get_tok_type(self):
+        return self.tok_type
+
+    def __repr__(self):
+        return "TOKEN N: " + str(self.name) + " V: " + str(self.val) + " T: " + str(self.tok_type)

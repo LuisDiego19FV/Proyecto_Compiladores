@@ -1,0 +1,101 @@
+        
+        # MAIN DFA
+        nodes = nodes0
+        counter = 0
+        for i in self.separateDFAs:
+            transitions = i[0].getTransition()
+            for j in range(len(transitions)):
+                to = transitions[j][0]
+                by = transitions[j][1]
+                nodes[0].setTransition(to, by)
+            
+            nodes += i[1:]
+
+        counter = 0
+        for node in nodes:
+            node.setState("T" + str(counter))
+            counter += 1
+        
+        self.mainDFA = nodes
+
+    # COMPONER
+    def scan(self):
+        # TOKEN VARIABLES
+        token = ""
+        tokens = []
+        characters = self.buffer[self.pointer: self.pointer + 1]
+        tmp_token = lex.simulateDFA(characters, self.mainDFA)
+
+        # COUNTER
+        counter = self.pointer
+
+        # IMIDATE END OF BUFFER
+        if self.end_buffer:
+            return cls_token("end_token", characters, -3)
+
+        # IMIDATE NOT A TOKEN
+        if tmp_token.get_tok_type() == -1:
+            if self.pointer >= len(self.buffer):
+                return cls_token("end_token", characters, -3)
+            else:
+                self.pointer += 1
+                return tmp_token
+
+        tokens.append(tmp_token)
+
+        # GET TOKEN UNTIL NOT A TOKEN
+        while tmp_token.get_tok_type() != -1 and counter <= len(self.buffer):
+            counter += 1
+            characters = self.buffer[self.pointer: counter]
+
+            # remove unecessary chars
+            for i in self.ignore_chars:
+                characters = characters.replace(i,'')
+
+            tmp_token = lex.simulateDFA(characters, self.mainDFA)
+
+            if tmp_token.get_tok_type() != -1:
+                tokens.append(tmp_token)
+
+        # GET LAST TOKEN
+        tokens = tokens[::-1]
+        for i in tokens:
+            if i.get_tok_type() != -2:
+                token = i
+                break
+            else:
+                counter -= 1
+
+        #IF NOT TOKEN FOUND
+        if token == "":
+            characters = self.buffer[self.pointer: counter + len(tokens) - 1]
+            self.pointer = counter + len(tokens) - 1
+            return cls_token("end_token", characters, -3)
+        
+        # TOKEN LENGHT CONDITION
+        if self.pointer == counter - 1:
+            characters = self.buffer[self.pointer: counter]
+
+            # remove unecessary chars
+            for i in self.ignore_chars:
+                characters = characters.replace(i,'')
+
+            self.pointer = counter
+        else:
+            characters = self.buffer[self.pointer: counter - 1]
+
+            # remove unecessary chars
+            for i in self.ignore_chars:
+                characters = characters.replace(i,'')
+
+            self.pointer = counter - 1
+
+        # END CONDITION
+        if self.pointer == len(self.buffer):
+            self.end_buffer = True
+
+        return token
+    
+    # BUFFER RESET
+    def reset_buffer(self):
+        self.end_buffer = False

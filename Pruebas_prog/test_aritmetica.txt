@@ -1,2 +1,5 @@
-while whhile do doo if iffs switch swift
-99 100 -10 -596 007 700 070
+100/2;
+5*5;
+3+2+5;
+3-2+5;
+15-(5*5*3);.

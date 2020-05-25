@@ -1,0 +1,30 @@
+import Lexer.lexer as lex
+from Lexer.nodes import Token as cls_token
+
+class Scanner():
+
+    def __init__(self, filename):
+
+        # COMPILER VARIABLES
+        self.tag = ""
+        self.filename = filename
+        self.pointer = 0
+        self.buffer = ""
+        self.end_buffer = False
+        self.ignore_chars = ""
+
+        # ADD FILE TO BUFFER 
+        file = open(filename)
+
+        for i in file:
+            self.buffer += i
+
+        # AUTOMATA VARIABLES
+        self.separateDFAs = []
+        self.mainDFA = None
+
+        self.process_tokens()
+
+    def process_tokens(self):
+    
+        # AUTOMATAS TOKENS
