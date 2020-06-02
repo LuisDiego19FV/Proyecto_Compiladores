@@ -29,86 +29,47 @@ class Scanner():
     
         # AUTOMATAS TOKENS
 
-        nodes0 = lex.regexToDFA("(>)","endarg",1)
+        nodes0 = lex.regexToDFA("(\r|\n|\t| )((\r|\n|\t| ))*","white",1)
         self.separateDFAs.append(nodes0)
         
-        nodes1 = lex.regexToDFA("(<)","startarg",2)
+        nodes1 = lex.regexToDFA("(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","number",2)
         self.separateDFAs.append(nodes1)
         
-        nodes2 = lex.regexToDFA("(.))","endcode",3)
+        nodes2 = lex.regexToDFA(")","pt7",3)
         self.separateDFAs.append(nodes2)
-        
-        nodes3 = lex.regexToDFA("((.)","startcode",4)
+
+        nodes3 = lex.regexToDFA("(","pt6",4)
         self.separateDFAs.append(nodes3)
-        
-        nodes4 = lex.regexToDFA("(CHR)(0|1|2|3|4|5|6|7|8|9)((0|1|2|3|4|5|6|7|8|9))*","charnumber",5)
+
+        nodes4 = lex.regexToDFA("/","pt5",5)
         self.separateDFAs.append(nodes4)
-        
-        nodes5 = lex.regexToDFA("(\")(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9))*(\")","string",6)
+
+        nodes5 = lex.regexToDFA("*","pt4",6)
         self.separateDFAs.append(nodes5)
-        
-        nodes6 = lex.regexToDFA("(')((\))*(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)(')","char",7)
+
+        nodes6 = lex.regexToDFA("-","pt3",7)
         self.separateDFAs.append(nodes6)
-        
-        nodes7 = lex.regexToDFA("ANY","pt18",8)
+
+        nodes7 = lex.regexToDFA("+","pt2",8)
         self.separateDFAs.append(nodes7)
 
-        nodes8 = lex.regexToDFA("}","pt17",9)
+        nodes8 = lex.regexToDFA(".","pt1",9)
         self.separateDFAs.append(nodes8)
 
-        nodes9 = lex.regexToDFA("{","pt16",10)
+        nodes9 = lex.regexToDFA(";","pt0",10)
         self.separateDFAs.append(nodes9)
 
-        nodes10 = lex.regexToDFA("]","pt15",11)
+        nodes10 = lex.regexToDFA("(switch)","switch",11)
         self.separateDFAs.append(nodes10)
 
-        nodes11 = lex.regexToDFA("[","pt14",12)
+        nodes11 = lex.regexToDFA("(do)","do",12)
         self.separateDFAs.append(nodes11)
 
-        nodes12 = lex.regexToDFA(")","pt13",13)
+        nodes12 = lex.regexToDFA("(while)","while",13)
         self.separateDFAs.append(nodes12)
 
-        nodes13 = lex.regexToDFA("(","pt12",14)
+        nodes13 = lex.regexToDFA("(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*","ident",14)
         self.separateDFAs.append(nodes13)
-
-        nodes14 = lex.regexToDFA("|","pt11",15)
-        self.separateDFAs.append(nodes14)
-
-        nodes15 = lex.regexToDFA("EXCEPT","pt10",16)
-        self.separateDFAs.append(nodes15)
-
-        nodes16 = lex.regexToDFA("PRODUCTIONS","pt9",17)
-        self.separateDFAs.append(nodes16)
-
-        nodes17 = lex.regexToDFA("TOKENS","pt8",18)
-        self.separateDFAs.append(nodes17)
-
-        nodes18 = lex.regexToDFA("KEYWORDS","pt7",19)
-        self.separateDFAs.append(nodes18)
-
-        nodes19 = lex.regexToDFA(".","pt6",20)
-        self.separateDFAs.append(nodes19)
-
-        nodes20 = lex.regexToDFA("-","pt5",21)
-        self.separateDFAs.append(nodes20)
-
-        nodes21 = lex.regexToDFA("+","pt4",22)
-        self.separateDFAs.append(nodes21)
-
-        nodes22 = lex.regexToDFA("=","pt3",23)
-        self.separateDFAs.append(nodes22)
-
-        nodes23 = lex.regexToDFA("CHARACTERS","pt2",24)
-        self.separateDFAs.append(nodes23)
-
-        nodes24 = lex.regexToDFA("END","pt1",25)
-        self.separateDFAs.append(nodes24)
-
-        nodes25 = lex.regexToDFA("COMPILER","pt0",26)
-        self.separateDFAs.append(nodes25)
-
-        nodes26 = lex.regexToDFA("(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*","ident",27)
-        self.separateDFAs.append(nodes26)
         
         # MAIN DFA
         nodes = nodes0

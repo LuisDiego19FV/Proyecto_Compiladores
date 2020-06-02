@@ -1,0 +1,32 @@
+COMPILER NumberOrWord  
+
+CHARACTERS 
+
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789".
+
+KEYWORDS
+
+while = "while".
+do = "do".
+switch = "switch".
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+number = digit{digit}.
+white = whitespace{whitespace}.
+
+PRODUCTIONS
+
+Suma= {Stat ";"}.
+
+Stat = 	(.value = 0.) Expression.
+
+Expression =  (Number | Word).
+	
+Number =  number (.print(self.t.get_val()).) .
+
+Word=  ident (.print(self.t.get_val()).) .
+
+END NumberOrWord

@@ -1,0 +1,60 @@
+COMPILER Aritmetica    
+
+CHARACTERS 
+
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789" .
+tab = CHR(9).
+eol = CHR(10).
+space = CHR(32).
+whitespace = CHR(13)+eol+tab+space.
+
+
+KEYWORDS
+
+while = "while".
+do = "do".
+switch = "switch".
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+number = digit{digit}.
+white = whitespace{whitespace}.
+
+PRODUCTIONS
+
+Aritmetica= {Stat ";" {white}}".".
+
+Stat = 							(.value = 0.)
+	Expression<ref value>		(.print(str(value)).)
+	.
+
+Expression<ref result> =		(.result1 = 0.) (.result2 = 0.)
+	Term<ref result1>
+	{    "+"Term<ref result2>		(.result1+=result2.)
+	   | "-"Term<ref result2>		(.result1-=result2.)
+	}							
+	(.result = result1.)
+	.
+
+Term<ref result>=				(.result1 = 0.) (.result2 = 0.)
+	Factor<ref result1>
+	{  	 "*"Factor<ref result2>	(.result1*=result2.)
+	   | "/"Factor<ref result2>	(.result1/=result2.)
+	}							
+	(.result=result1.)
+	.
+	
+Factor<ref result> =
+	(.signo = 1.)
+	["-"(.signo = -1.)]
+	(Number<ref result> | "(" Expression<ref result> ")")
+	(.result *= signo.)
+	.
+	
+Number<ref result> =  
+	number 
+	(.result = int(self.t.get_val()).)
+	.
+END Aritmetica

@@ -13,269 +13,93 @@ class Parser():
 
         self._EOF = 0
     
-        self._endarg = 1
-        self._startarg = 2
-        self._endcode = 3
-        self._startcode = 4
-        self._charnumber = 5
-        self._string = 6
-        self._char = 7
-        self._pt18 = 8
-        self._pt17 = 9
-        self._pt16 = 10
-        self._pt15 = 11
-        self._pt14 = 12
-        self._pt13 = 13
-        self._pt12 = 14
-        self._pt11 = 15
-        self._pt10 = 16
-        self._pt9 = 17
-        self._pt8 = 18
-        self._pt7 = 19
-        self._pt6 = 20
-        self._pt5 = 21
-        self._pt4 = 22
-        self._pt3 = 23
-        self._pt2 = 24
-        self._pt1 = 25
-        self._pt0 = 26
-        self._ident = 27
-        self.maxT = 28
+        self._white = 1
+        self._number = 2
+        self._pt7 = 3
+        self._pt6 = 4
+        self._pt5 = 5
+        self._pt4 = 6
+        self._pt3 = 7
+        self._pt2 = 8
+        self._pt1 = 9
+        self._pt0 = 10
+        self._switch = 11
+        self._do = 12
+        self._while = 13
+        self._ident = 14
+        self.maxT = 15
 
-        self.MyCOCOR()
+        self.Aritmetica()
          
 
-    def MyCOCOR(self):
-        CompilerName = ""
-        EndName = ""
-        self.Expect(self._pt0)
-        CompilerName = self.Ident(CompilerName)
-        print("Nombre Inicial del Compilador:",CompilerName)
-        if(self.la.get_tok_type() == self._startcode):
-            self.Codigo()
-        self.Body()
+    def Aritmetica(self):
+        while(self.la.get_tok_type() == self._pt3 or self.la.get_tok_type() == self._number or self.la.get_tok_type() == self._pt6):
+            self.Stat()
+            self.Expect(self._pt0)
+            while(self.la.get_tok_type() == self._white):
+                self.Expect(self._white)
         self.Expect(self._pt1)
-        EndName = self.Ident(EndName)
-        print("Nombre Final del Compilador:",EndName)
  
 
-    def Body(self):
-        self.Characters()
-        if(self.la.get_tok_type() == self._pt7):
-            self.Keywords()
-        self.Tokens()
-        self.Productions()
+    def Stat(self):
+        value = 0
+        value = self.Expression(value)
+        print(str(value))
  
 
-    def Characters(self):
-        CharName = ""
-        Counter = 0
-        self.Expect(self._pt2)
-        print("LEYENDO CHARACTERS")
-        while(self.la.get_tok_type() == self._ident):
-            CharName = self.Ident(CharName)
-            Counter += 1
-            print("Char Set "+ str(Counter) + ": " + str(CharName))
+    def Expression(self, result):
+        result1 = 0
+        result2 = 0
+        result1 = self.Term(result1)
+        while(self.la.get_tok_type() == self._pt2 or self.la.get_tok_type() == self._pt3):
+            if(self.la.get_tok_type() == self._pt2):
+                self.Expect(self._pt2)
+                result2 = self.Term(result2)
+                result1+=result2
+            elif(self.la.get_tok_type() == self._pt3):
+                self.Expect(self._pt3)
+                result2 = self.Term(result2)
+                result1-=result2
+        result = result1
+        return(result)
+ 
+
+    def Term(self, result):
+        result1 = 0
+        result2 = 0
+        result1 = self.Factor(result1)
+        while(self.la.get_tok_type() == self._pt4 or self.la.get_tok_type() == self._pt5):
+            if(self.la.get_tok_type() == self._pt4):
+                self.Expect(self._pt4)
+                result2 = self.Factor(result2)
+                result1*=result2
+            elif(self.la.get_tok_type() == self._pt5):
+                self.Expect(self._pt5)
+                result2 = self.Factor(result2)
+                result1/=result2
+        result=result1
+        return(result)
+ 
+
+    def Factor(self, result):
+        signo = 1
+        if(self.la.get_tok_type() == self._pt3):
             self.Expect(self._pt3)
-            self.CharSet()
-            while(self.la.get_tok_type() == self._pt4 or self.la.get_tok_type() == self._pt5):
-                if(self.la.get_tok_type() == self._pt4):
-                    self.Expect(self._pt4)
-                    self.CharSet()
-                elif(self.la.get_tok_type() == self._pt5):
-                    self.Expect(self._pt5)
-                    self.CharSet()
+            signo = -1
+        if(self.la.get_tok_type() == self._number):
+            result = self.Number(result)
+        elif(self.la.get_tok_type() == self._pt6):
             self.Expect(self._pt6)
+            result = self.Expression(result)
+            self.Expect(self._pt7)
+        result *= signo
+        return(result)
  
 
-    def Keywords(self):
-        KeyName = ""
-        StringValue = ""
-        Counter = 0
-        self.Expect(self._pt7)
-        print("LEYENDO KEYWORDS")
-        while(self.la.get_tok_type() == self._ident):
-            KeyName = self.Ident(KeyName)
-            Counter += 1
-            print("KeyWord "+ str(Counter) + ": " + str(KeyName))
-            self.Expect(self._pt3)
-            StringValue = self.String(StringValue)
-            self.Expect(self._pt6)
- 
-
-    def Tokens(self):
-        TokenName = ""
-        Counter = 0
-        self.Expect(self._pt8)
-        print("LEYENDO TOKENS")
-        while(self.la.get_tok_type() == self._ident):
-            TokenName = self.Ident(TokenName)
-            Counter += 1
-            print("Token "+ str(Counter) + ": " + str(TokenName))
-            self.Expect(self._pt3)
-            self.TokenExpr()
-            if(self.la.get_tok_type() == self._pt10):
-                self.ExceptKeyword()
-            self.Expect(self._pt6)
- 
-
-    def Productions(self):
-        Counter = 0
-        self.Expect(self._pt9)
-        ProdName = ""
-        print("LEYENDO PRODUCTIONS")
-        while(self.la.get_tok_type() == self._ident):
-            ProdName = self.Ident(ProdName)
-            Counter += 1
-            print("Production "+ str(Counter) + ": " + str(ProdName))
-            if(self.la.get_tok_type() == self._startarg):
-                self.Atributos()
-            self.Expect(self._pt3)
-            if(self.la.get_tok_type() == self._startcode):
-                self.Codigo()
-            self.ProductionExpr()
-            if(self.la.get_tok_type() == self._startcode):
-                self.Codigo()
-            self.Expect(self._pt6)
- 
-
-    def ExceptKeyword(self):
-        self.Expect(self._pt10)
-        self.Expect(self._pt7)
- 
-
-    def ProductionExpr(self):
-        self.ProdTerm()
-        while(self.la.get_tok_type() == self._pt11):
-            self.Expect(self._pt11)
-            self.ProdTerm()
- 
-
-    def ProdTerm(self):
-        self.ProdFactor()
-        while(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._startarg or self.la.get_tok_type() == self._pt12 or self.la.get_tok_type() == self._pt14 or self.la.get_tok_type() == self._pt16 or self.la.get_tok_type() == self._startcode):
-            self.ProdFactor()
- 
-
-    def ProdFactor(self):
-        if(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._startarg):
-            self.SymbolProd()
-        elif(self.la.get_tok_type() == self._pt12):
-            self.Expect(self._pt12)
-            self.ProductionExpr()
-            self.Expect(self._pt13)
-        elif(self.la.get_tok_type() == self._pt14):
-            self.Expect(self._pt14)
-            self.ProductionExpr()
-            self.Expect(self._pt15)
-        elif(self.la.get_tok_type() == self._pt16):
-            self.Expect(self._pt16)
-            self.ProductionExpr()
-            self.Expect(self._pt17)
-        if(self.la.get_tok_type() == self._startcode):
-            self.Codigo()
- 
-
-    def SymbolProd(self):
-        SV = ""
-        IN = ""
-        if(self.la.get_tok_type() == self._string):
-            SV = self.String(SV)
-            print("String en Production: ",SV)
-        elif(self.la.get_tok_type() == self._char):
-            self.Expect(self._char)
-        if(self.la.get_tok_type() == self._ident):
-            IN = self.Ident(IN)
-            print("Identificador en Production: ",IN)
-            if(self.la.get_tok_type() == self._startarg):
-                self.Atributos()
- 
-
-    def Codigo(self):
-        self.Expect(self._startcode)
-        self.Any("endcode")
-        self.Expect(self._endcode)
- 
-
-    def Atributos(self):
-        self.Expect(self._startarg)
-        self.Any("endarg")
-        self.Expect(self._endarg)
- 
-
-    def TokenExpr(self):
-        self.TokenTerm()
-        while(self.la.get_tok_type() == self._pt11):
-            self.Expect(self._pt11)
-            self.TokenTerm()
- 
-
-    def TokenTerm(self):
-        self.TokenFactor()
-        while(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._pt12 or self.la.get_tok_type() == self._pt14 or self.la.get_tok_type() == self._pt16):
-            self.TokenFactor()
- 
-
-    def TokenFactor(self):
-        if(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident):
-            self.SimbolToken()
-        elif(self.la.get_tok_type() == self._pt12):
-            self.Expect(self._pt12)
-            self.TokenExpr()
-            self.Expect(self._pt13)
-        elif(self.la.get_tok_type() == self._pt14):
-            self.Expect(self._pt14)
-            self.TokenExpr()
-            self.Expect(self._pt15)
-        elif(self.la.get_tok_type() == self._pt16):
-            self.Expect(self._pt16)
-            self.TokenExpr()
-            self.Expect(self._pt17)
- 
-
-    def SimbolToken(self):
-        IdentName = ""
-        StringValue = ""
-        if(self.la.get_tok_type() == self._string):
-            StringValue = self.String(StringValue)
-        elif(self.la.get_tok_type() == self._char):
-            self.Expect(self._char)
-        if(self.la.get_tok_type() == self._ident):
-            IdentName = self.Ident(IdentName)
-            print("Identificador en Token: ",IdentName)
- 
-
-    def CharSet(self):
-        IdentName = ""
-        StringValue = ""
-        if(self.la.get_tok_type() == self._string):
-            StringValue = self.String(StringValue)
-        if(self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._charnumber):
-            self.Char()
-        elif(self.la.get_tok_type() == self._pt18):
-            self.Expect(self._pt18)
-        if(self.la.get_tok_type() == self._ident):
-            IdentName = self.Ident(IdentName)
-            print("Identificador en CharSet: ",IdentName)
- 
-
-    def Char(self):
-        if(self.la.get_tok_type() == self._char):
-            self.Expect(self._char)
-        elif(self.la.get_tok_type() == self._charnumber):
-            self.Expect(self._charnumber)
- 
-
-    def String(self, S):
-        self.Expect(self._string)
-        S = self.t.get_val()
-        return(S)
- 
-
-    def Ident(self, S):
-        self.Expect(self._ident)
-        S = self.t.get_val()
-        return(S)
+    def Number(self, result):
+        self.Expect(self._number)
+        result = int(self.t.get_val())
+        return(result)
 
     
     def Get(self):
@@ -308,84 +132,45 @@ class Parser():
             s = "EOF"
         
         elif expected == 1:
-            s = "endarg"
+            s = "white"
 
         elif expected == 2:
-            s = "startarg"
+            s = "number"
 
         elif expected == 3:
-            s = "endcode"
-
-        elif expected == 4:
-            s = "startcode"
-
-        elif expected == 5:
-            s = "charnumber"
-
-        elif expected == 6:
-            s = "string"
-
-        elif expected == 7:
-            s = "char"
-
-        elif expected == 8:
-            s = "ANY"
-
-        elif expected == 9:
-            s = "}"
-
-        elif expected == 10:
-            s = "{"
-
-        elif expected == 11:
-            s = "]"
-
-        elif expected == 12:
-            s = "["
-
-        elif expected == 13:
             s = ")"
 
-        elif expected == 14:
+        elif expected == 4:
             s = "("
 
-        elif expected == 15:
-            s = "|"
+        elif expected == 5:
+            s = "/"
 
-        elif expected == 16:
-            s = "EXCEPT"
+        elif expected == 6:
+            s = "*"
 
-        elif expected == 17:
-            s = "PRODUCTIONS"
-
-        elif expected == 18:
-            s = "TOKENS"
-
-        elif expected == 19:
-            s = "KEYWORDS"
-
-        elif expected == 20:
-            s = "."
-
-        elif expected == 21:
+        elif expected == 7:
             s = "-"
 
-        elif expected == 22:
+        elif expected == 8:
             s = "+"
 
-        elif expected == 23:
-            s = "="
+        elif expected == 9:
+            s = "."
 
-        elif expected == 24:
-            s = "CHARACTERS"
+        elif expected == 10:
+            s = ";"
 
-        elif expected == 25:
-            s = "END"
+        elif expected == 11:
+            s = "switch"
 
-        elif expected == 26:
-            s = "COMPILER"
+        elif expected == 12:
+            s = "do"
 
-        elif expected == 27:
+        elif expected == 13:
+            s = "while"
+
+        elif expected == 14:
             s = "ident"
 
         print("Error: Expected " + s)
