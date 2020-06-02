@@ -1,5 +1,7 @@
 # Proyecto_Compiladores
 
+Este proyecto se inspira en CoCoR para crear un generador de parsers y scanners en base a archivos CoCoL.
+
 Librerías
 
 Para correr el programa se recomienda utilizar Python 3.7 o superior, y se requiere tener las siguientes librerías instaladas:
