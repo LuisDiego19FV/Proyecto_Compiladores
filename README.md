@@ -1,12 +1,12 @@
 # Proyecto_Compiladores
 
-###Librerías
+Librerías
 
 Para correr el programa se recomienda utilizar Python 3.7 o superior, y se requiere tener las siguientes librerías instaladas:
 •	  PySimpleGUI (Para utilizar la GUI de la aplicación)
 •	  PySimpleAutomata (Para imprimir el DFA en un archivo)
 
-###Ejecución
+Ejecución
 
 Para correr el archivo para la producción del parser y scanner únicamente se necesita correr:
   python .\my_cocor.py
