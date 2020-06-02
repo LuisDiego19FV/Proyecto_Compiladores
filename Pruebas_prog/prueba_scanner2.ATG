@@ -1,4 +1,4 @@
-COMPILER Aritmetica    
+COMPILER NumberOrWord  
 
 CHARACTERS 
 
@@ -7,17 +7,26 @@ digit = "0123456789".
 
 KEYWORDS
 
-if = "if".
 while = "while".
+do = "do".
+switch = "switch".
 
 TOKENS
 
-ident = letter{letter|digit}.
+ident = letter{letter|digit} EXCEPT KEYWORDS.
 number = digit{digit}.
 white = whitespace{whitespace}.
 
 PRODUCTIONS
 
-Aritmetica= {Stat ";" {white}}".".
+Suma= {Stat ";"}.
 
-END Aritmetica
+Stat = 	(.value = 0.) Expression.
+
+Expression =  (Number | Word).
+	
+Number =  number (.print(self.t.get_val()).) .
+
+Word=  ident (.print(self.t.get_val()).) .
+
+END NumberOrWord

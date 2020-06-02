@@ -44,6 +44,7 @@ def display(reader, writer):
     for i in reader.comp_producs:
         window['-OUTPUT4-'+sg.WRITE_ONLY_KEY].print("Name: " + str(i[0]))
         window['-OUTPUT4-'+sg.WRITE_ONLY_KEY].print("   Arguments: " + str(i[1]))
+        window['-OUTPUT4-'+sg.WRITE_ONLY_KEY].print("   Array:     " + str(i[2]) + "\n")
 
     # Event loop
     while True: 

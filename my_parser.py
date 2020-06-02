@@ -13,201 +13,293 @@ class Parser():
 
         self._EOF = 0
     
-        self._white = 1
-        self._endpoint = 2
-        self._equal = 3
-        self._chardef = 4
-        self._number = 5
-        self._expect_key = 6
-        self._end_section = 7
-        self._pro_section = 8
-        self._tok_section = 9
-        self._key_section = 10
-        self._char_seciton = 11
-        self._comp_section = 12
-        self._name = 13
-        self._pt3 = 14
-        self._pt2 = 15
-        self._pt1 = 16
-        self._pt0 = 17
-        self.maxT = 18
+        self._endarg = 1
+        self._startarg = 2
+        self._endcode = 3
+        self._startcode = 4
+        self._charnumber = 5
+        self._string = 6
+        self._char = 7
+        self._pt18 = 8
+        self._pt17 = 9
+        self._pt16 = 10
+        self._pt15 = 11
+        self._pt14 = 12
+        self._pt13 = 13
+        self._pt12 = 14
+        self._pt11 = 15
+        self._pt10 = 16
+        self._pt9 = 17
+        self._pt8 = 18
+        self._pt7 = 19
+        self._pt6 = 20
+        self._pt5 = 21
+        self._pt4 = 22
+        self._pt3 = 23
+        self._pt2 = 24
+        self._pt1 = 25
+        self._pt0 = 26
+        self._ident = 27
+        self.maxT = 28
 
-        self.Parser()
+        self.MyCOCOR()
          
 
-    def Parser(self):
-        self.comp_name = ""
-        self.characters_vals = []
-        self.characters_names = []
-        self.tokens_vals = []
-        self.tokens_names = []
-        while(self.la.get_tok_type() == self._comp_section):
-            self.Compiler_read()
-        
-        # Write Scanner
-        file = open("Templates/scanner_template_1.txt", "r")
-        part1 = file.readlines()
-        file.close()
-        
-        file = open("Templates/scanner_template_2.txt", "r")
-        part2 = file.readlines()
-        file.close()
-        
-        file = open("my_scanner2.py", "w")
-        for i in part1:
-            file.write(i)
-        
-        for i in range(len(self.tokens_names)):
-            file.write("        nodes" + str(i) + " = lex.regexToDFA(\"" + str(self.tokens_vals[i]) + "\", \"" + str(self.tokens_names[i]) + "\", " + str(i) + ")\n")
-            file.write("        self.separateDFAs.append(nodes" + str(i) + ")\n\n")
-        
-        for i in part2:
-            file.write(i)
-        
-        file.close()
-        
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        self.Expect(self._pro_section)
+    def MyCOCOR(self):
+        CompilerName = ""
+        EndName = ""
+        self.Expect(self._pt0)
+        CompilerName = self.Ident(CompilerName)
+        print("Nombre Inicial del Compilador:",CompilerName)
+        if(self.la.get_tok_type() == self._startcode):
+            self.Codigo()
+        self.Body()
+        self.Expect(self._pt1)
+        EndName = self.Ident(EndName)
+        print("Nombre Final del Compilador:",EndName)
  
 
-    def Compiler_read(self):
-        self.Expect(self._comp_section)
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        self.Expect(self._name)
-        self.comp_name = str(self.t.get_val())
-        self.Sections()
+    def Body(self):
+        self.Characters()
+        if(self.la.get_tok_type() == self._pt7):
+            self.Keywords()
+        self.Tokens()
+        self.Productions()
  
 
-    def Sections(self):
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        while(self.la.get_tok_type() == self._char_seciton or self.la.get_tok_type() == self._key_section or self.la.get_tok_type() == self._tok_section):
-            declare_names = []
-            declare_values = []
-            if(self.la.get_tok_type() == self._char_seciton):
-                self.Expect(self._char_seciton)
-                #GET CHARS
-                declare_names,declare_values = self.Declare_chars(declare_names, declare_values)
-                #SET CHARS
-                self.characters_names = declare_names
-                self.characters_vals = declare_values
-            elif(self.la.get_tok_type() == self._key_section):
-                self.Expect(self._key_section)
-                #GET KEYS
-                declare_names,declare_values = self.Declare_keys(declare_names, declare_values)
-                #SET KEYS
-                self.tokens_names = declare_names
-                self.tokens_vals = declare_values
-            elif(self.la.get_tok_type() == self._tok_section):
-                self.Expect(self._tok_section)
-                #GET TOKS
-                declare_names,declare_values = self.Declare_tokens(declare_names, declare_values)
-                #SET TOKS
-                self.tokens_names += declare_names
-                self.tokens_vals += declare_values
+    def Characters(self):
+        CharName = ""
+        Counter = 0
+        self.Expect(self._pt2)
+        print("LEYENDO CHARACTERS")
+        while(self.la.get_tok_type() == self._ident):
+            CharName = self.Ident(CharName)
+            Counter += 1
+            print("Char Set "+ str(Counter) + ": " + str(CharName))
+            self.Expect(self._pt3)
+            self.CharSet()
+            while(self.la.get_tok_type() == self._pt4 or self.la.get_tok_type() == self._pt5):
+                if(self.la.get_tok_type() == self._pt4):
+                    self.Expect(self._pt4)
+                    self.CharSet()
+                elif(self.la.get_tok_type() == self._pt5):
+                    self.Expect(self._pt5)
+                    self.CharSet()
+            self.Expect(self._pt6)
  
 
-    def Declare_chars(self, declare_names,  declare_values):
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        while(self.la.get_tok_type() == self._name):
-            self.Expect(self._name)
-            declare_names.append(self.t.get_val())
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._equal)
-            self.Expect(self._pt0)
-            if(self.la.get_tok_type() == self._name):
-                self.Expect(self._name)
-                tmp_value = str(self.t.get_val())
-                declare_values.append("|".join(tmp_value[i:i+1] for i in range(0, len(tmp_value), 1)))
-            elif(self.la.get_tok_type() == self._number):
-                self.Expect(self._number)
-                tmp_value = str(self.t.get_val())
-                declare_values.append("|".join(tmp_value[i:i+1] for i in range(0, len(tmp_value), 1)))
-            self.Expect(self._pt0)
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._endpoint)
-        return(declare_names, declare_values)
+    def Keywords(self):
+        KeyName = ""
+        StringValue = ""
+        Counter = 0
+        self.Expect(self._pt7)
+        print("LEYENDO KEYWORDS")
+        while(self.la.get_tok_type() == self._ident):
+            KeyName = self.Ident(KeyName)
+            Counter += 1
+            print("KeyWord "+ str(Counter) + ": " + str(KeyName))
+            self.Expect(self._pt3)
+            StringValue = self.String(StringValue)
+            self.Expect(self._pt6)
  
 
-    def Declare_keys(self, declare_names,  declare_values):
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        while(self.la.get_tok_type() == self._name):
-            self.Expect(self._name)
-            declare_names.append(self.t.get_val())
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._equal)
-            self.Expect(self._pt0)
-            if(self.la.get_tok_type() == self._name):
-                self.Expect(self._name)
-                tmp_value = str(self.t.get_val())
-                declare_values.append("|".join(tmp_value[i:i+1] for i in range(0, len(tmp_value), 1)))
-            elif(self.la.get_tok_type() == self._number):
-                self.Expect(self._number)
-                tmp_value = str(self.t.get_val())
-                declare_values.append("|".join(tmp_value[i:i+1] for i in range(0, len(tmp_value), 1)))
-            self.Expect(self._pt0)
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._endpoint)
-        return(declare_names, declare_values)
+    def Tokens(self):
+        TokenName = ""
+        Counter = 0
+        self.Expect(self._pt8)
+        print("LEYENDO TOKENS")
+        while(self.la.get_tok_type() == self._ident):
+            TokenName = self.Ident(TokenName)
+            Counter += 1
+            print("Token "+ str(Counter) + ": " + str(TokenName))
+            self.Expect(self._pt3)
+            self.TokenExpr()
+            if(self.la.get_tok_type() == self._pt10):
+                self.ExceptKeyword()
+            self.Expect(self._pt6)
  
 
-    def Declare_tokens(self, declare_names,  declare_values):
-        while(self.la.get_tok_type() == self._white):
-            self.Expect(self._white)
-        while(self.la.get_tok_type() == self._name):
-            self.Expect(self._name)
-            declare_names.append(self.t.get_val())
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._equal)
-            tmp_tok_value = ""
-            while(self.la.get_tok_type() == self._name or self.la.get_tok_type() == self._pt1 or self.la.get_tok_type() == self._pt2 or self.la.get_tok_type() == self._pt3):
-                if(self.la.get_tok_type() == self._name):
-                    self.Expect(self._name)
-                    value = str(self.t.get_val())
-                    value = self.Get_value_from_chars(value)
-                    tmp_tok_value += "(" + value + ")"
-                elif(self.la.get_tok_type() == self._pt1):
-                    self.Expect(self._pt1)
-                    tmp_tok_value += "|"
-                elif(self.la.get_tok_type() == self._pt2):
-                    self.Expect(self._pt2)
-                    tmp_tok_value += "("
-                elif(self.la.get_tok_type() == self._pt3):
-                    self.Expect(self._pt3)
-                    tmp_tok_value += ")*"
-            while(self.la.get_tok_type() == self._white):
-                self.Expect(self._white)
-            self.Expect(self._endpoint)
-            declare_values.append(tmp_tok_value)
-        return(declare_names, declare_values)
+    def Productions(self):
+        Counter = 0
+        self.Expect(self._pt9)
+        ProdName = ""
+        print("LEYENDO PRODUCTIONS")
+        while(self.la.get_tok_type() == self._ident):
+            ProdName = self.Ident(ProdName)
+            Counter += 1
+            print("Production "+ str(Counter) + ": " + str(ProdName))
+            if(self.la.get_tok_type() == self._startarg):
+                self.Atributos()
+            self.Expect(self._pt3)
+            if(self.la.get_tok_type() == self._startcode):
+                self.Codigo()
+            self.ProductionExpr()
+            if(self.la.get_tok_type() == self._startcode):
+                self.Codigo()
+            self.Expect(self._pt6)
  
 
-    def Get_value_from_chars(self, value):
-        if value in self.characters_names:
-            value = str(self.characters_vals[self.characters_names.index(value)])
-        return(value)
+    def ExceptKeyword(self):
+        self.Expect(self._pt10)
+        self.Expect(self._pt7)
+ 
+
+    def ProductionExpr(self):
+        self.ProdTerm()
+        while(self.la.get_tok_type() == self._pt11):
+            self.Expect(self._pt11)
+            self.ProdTerm()
+ 
+
+    def ProdTerm(self):
+        self.ProdFactor()
+        while(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._startarg or self.la.get_tok_type() == self._pt12 or self.la.get_tok_type() == self._pt14 or self.la.get_tok_type() == self._pt16 or self.la.get_tok_type() == self._startcode):
+            self.ProdFactor()
+ 
+
+    def ProdFactor(self):
+        if(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._startarg):
+            self.SymbolProd()
+        elif(self.la.get_tok_type() == self._pt12):
+            self.Expect(self._pt12)
+            self.ProductionExpr()
+            self.Expect(self._pt13)
+        elif(self.la.get_tok_type() == self._pt14):
+            self.Expect(self._pt14)
+            self.ProductionExpr()
+            self.Expect(self._pt15)
+        elif(self.la.get_tok_type() == self._pt16):
+            self.Expect(self._pt16)
+            self.ProductionExpr()
+            self.Expect(self._pt17)
+        if(self.la.get_tok_type() == self._startcode):
+            self.Codigo()
+ 
+
+    def SymbolProd(self):
+        SV = ""
+        IN = ""
+        if(self.la.get_tok_type() == self._string):
+            SV = self.String(SV)
+            print("String en Production: ",SV)
+        elif(self.la.get_tok_type() == self._char):
+            self.Expect(self._char)
+        if(self.la.get_tok_type() == self._ident):
+            IN = self.Ident(IN)
+            print("Identificador en Production: ",IN)
+            if(self.la.get_tok_type() == self._startarg):
+                self.Atributos()
+ 
+
+    def Codigo(self):
+        self.Expect(self._startcode)
+        self.Any("endcode")
+        self.Expect(self._endcode)
+ 
+
+    def Atributos(self):
+        self.Expect(self._startarg)
+        self.Any("endarg")
+        self.Expect(self._endarg)
+ 
+
+    def TokenExpr(self):
+        self.TokenTerm()
+        while(self.la.get_tok_type() == self._pt11):
+            self.Expect(self._pt11)
+            self.TokenTerm()
+ 
+
+    def TokenTerm(self):
+        self.TokenFactor()
+        while(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident or self.la.get_tok_type() == self._pt12 or self.la.get_tok_type() == self._pt14 or self.la.get_tok_type() == self._pt16):
+            self.TokenFactor()
+ 
+
+    def TokenFactor(self):
+        if(self.la.get_tok_type() == self._string or self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._ident):
+            self.SimbolToken()
+        elif(self.la.get_tok_type() == self._pt12):
+            self.Expect(self._pt12)
+            self.TokenExpr()
+            self.Expect(self._pt13)
+        elif(self.la.get_tok_type() == self._pt14):
+            self.Expect(self._pt14)
+            self.TokenExpr()
+            self.Expect(self._pt15)
+        elif(self.la.get_tok_type() == self._pt16):
+            self.Expect(self._pt16)
+            self.TokenExpr()
+            self.Expect(self._pt17)
+ 
+
+    def SimbolToken(self):
+        IdentName = ""
+        StringValue = ""
+        if(self.la.get_tok_type() == self._string):
+            StringValue = self.String(StringValue)
+        elif(self.la.get_tok_type() == self._char):
+            self.Expect(self._char)
+        if(self.la.get_tok_type() == self._ident):
+            IdentName = self.Ident(IdentName)
+            print("Identificador en Token: ",IdentName)
+ 
+
+    def CharSet(self):
+        IdentName = ""
+        StringValue = ""
+        if(self.la.get_tok_type() == self._string):
+            StringValue = self.String(StringValue)
+        if(self.la.get_tok_type() == self._char or self.la.get_tok_type() == self._charnumber):
+            self.Char()
+        elif(self.la.get_tok_type() == self._pt18):
+            self.Expect(self._pt18)
+        if(self.la.get_tok_type() == self._ident):
+            IdentName = self.Ident(IdentName)
+            print("Identificador en CharSet: ",IdentName)
+ 
+
+    def Char(self):
+        if(self.la.get_tok_type() == self._char):
+            self.Expect(self._char)
+        elif(self.la.get_tok_type() == self._charnumber):
+            self.Expect(self._charnumber)
+ 
+
+    def String(self, S):
+        self.Expect(self._string)
+        S = self.t.get_val()
+        return(S)
+ 
+
+    def Ident(self, S):
+        self.Expect(self._ident)
+        S = self.t.get_val()
+        return(S)
 
     
     def Get(self):
         self.t = self.la
         self.la = self.sc.scan()
-        if self.la.get_tok_type() < 0 or self.la.get_tok_type() > self.maxT:
-            self.la = self.t
+
+        while self.la.get_tok_type() == -1:
+            self.la = self.sc.scan()
+
+        if self.t.get_tok_type() == -3:
+            print("END REACHED")
+            exit()
+
+    def Any(self, stop):
+        while self.la.get_name() != stop:
+            self.Get()
 
     def Expect(self, expected):
         if self.la.get_tok_type() == expected:
             self.Get()
         else:
-            self.SymError(expected)    
+            self.SymError(expected)   
+            self.Get()
+            self.Expect(expected) 
 
     def SymError(self, expected):
         s = "Other"
@@ -216,59 +308,88 @@ class Parser():
             s = "EOF"
         
         elif expected == 1:
-            s = "white"
+            s = "endarg"
 
         elif expected == 2:
-            s = "endpoint"
+            s = "startarg"
 
         elif expected == 3:
-            s = "equal"
+            s = "endcode"
 
         elif expected == 4:
-            s = "chardef"
+            s = "startcode"
 
         elif expected == 5:
-            s = "number"
+            s = "charnumber"
 
         elif expected == 6:
-            s = "expect_key"
+            s = "string"
 
         elif expected == 7:
-            s = "end_section"
+            s = "char"
 
         elif expected == 8:
-            s = "pro_section"
+            s = "ANY"
 
         elif expected == 9:
-            s = "tok_section"
-
-        elif expected == 10:
-            s = "key_section"
-
-        elif expected == 11:
-            s = "char_seciton"
-
-        elif expected == 12:
-            s = "comp_section"
-
-        elif expected == 13:
-            s = "name"
-
-        elif expected == 14:
             s = "}"
 
-        elif expected == 15:
+        elif expected == 10:
             s = "{"
 
-        elif expected == 16:
+        elif expected == 11:
+            s = "]"
+
+        elif expected == 12:
+            s = "["
+
+        elif expected == 13:
+            s = ")"
+
+        elif expected == 14:
+            s = "("
+
+        elif expected == 15:
             s = "|"
 
+        elif expected == 16:
+            s = "EXCEPT"
+
         elif expected == 17:
-            s = "\""
+            s = "PRODUCTIONS"
+
+        elif expected == 18:
+            s = "TOKENS"
+
+        elif expected == 19:
+            s = "KEYWORDS"
+
+        elif expected == 20:
+            s = "."
+
+        elif expected == 21:
+            s = "-"
+
+        elif expected == 22:
+            s = "+"
+
+        elif expected == 23:
+            s = "="
+
+        elif expected == 24:
+            s = "CHARACTERS"
+
+        elif expected == 25:
+            s = "END"
+
+        elif expected == 26:
+            s = "COMPILER"
+
+        elif expected == 27:
+            s = "ident"
 
         print("Error: Expected " + s)
         print("Last token : " + str(self.t))
         print("Last Look-a: " + str(self.la))
         print("Scanner Pointer: " + str(self.sc.pointer))
-        exit()
         

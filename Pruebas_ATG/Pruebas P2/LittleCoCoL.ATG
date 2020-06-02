@@ -1,0 +1,254 @@
+COMPILER MyCOCOR
+(.//Especificacion de Funciones.)
+CHARACTERS
+
+letter= "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz".
+digit= "0123456789".
+
+cr = CHR(13).
+lf = CHR(10).
+tab = CHR(9).
+ignore = cr+lf+tab.
+comillas = CHR(34).
+stringletter = ANY-comillas-ignore.
+
+operadores ="+-=()[]{}|.<>".
+MyANY = ANY-operadores.
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+string = comillas stringletter{stringletter} comillas.
+
+char = "'"["/"]letter"'".
+charnumber = "CHR("digit{digit}")".
+charinterval = "CHR("digit{digit}")""..""CHR("digit{digit}")".
+
+nontoken = MyANY.
+startcode ="(.".
+endcode=".)".
+
+IGNORE SET ignore
+
+PRODUCTIONS
+
+MyCOCOR= 				(.string CompilerName = new string(' ',0);
+					  string EndName = new string(' ',0);.)
+	"COMPILER" 
+	Ident<ref CompilerName>		(.System.Console.WriteLine("Nombre Inicial del Compilador:{0}",CompilerName);.) 
+	[Codigo]
+	Body
+	"END" Ident<ref EndName>	(.System.Console.WriteLine("Nombre Final del Compilador:{0}",EndName);.) 
+.
+
+Body = 
+	Characters 
+	[Keywords] 
+	Tokens 
+	Productions  	
+.
+
+
+Characters =				(.string CharName = new string(' ',0);
+					   int Counter = 0;.)
+
+	"CHARACTERS"			(.System.Console.WriteLine("LEYENDO CHARACTERS");.)
+	{
+		Ident<ref CharName>	(.Counter++;System.Console.WriteLine("Char Set {0}: {1}",Counter,CharName);.)
+		"="
+		CharSet			
+		{
+			"+"CharSet
+			|
+			"-"CharSet
+		}
+		"."
+	}
+.
+			 
+Keywords = 				(.string KeyName = new string(' ',0);
+					  string StringValue = new string(' ',0);
+    					  int Counter = 0;.)
+
+	"KEYWORDS"			(.System.Console.WriteLine("LEYENDO KEYWORDS");.)
+	{
+		
+		Ident<ref KeyName>	(.Counter++;System.Console.WriteLine("KeyWord {0}: {1}",Counter,KeyName);.)
+		"="
+		String<ref StringValue>
+		"."
+
+	}
+
+.
+
+
+Tokens =				(.string TokenName = new string(' ',0);
+					  int Counter = 0;.)
+	
+	"TOKENS"			(.System.Console.WriteLine("LEYENDO TOKENS");.)
+	{
+		Ident<ref TokenName>	(.Counter++;System.Console.WriteLine("Token {0}: {1}",Counter,TokenName);.)
+		"="
+		TokenExpr
+		[ExceptKeyword]
+		"."
+
+	}
+
+.
+
+
+Productions = 				(.int Counter = 0;.)
+	
+	"PRODUCTIONS"			(.string ProdName = new string(' ',0);
+					  System.Console.WriteLine("LEYENDO PRODUCTIONS");.)
+	{
+		Ident<ref ProdName>	(.Counter++;System.Console.WriteLine("Production {0}: {1}",Counter,ProdName);.)
+		[Atributos]
+		"="
+		[Codigo]
+		ProductionExpr
+		"."
+
+	}
+.
+
+ExceptKeyword= 
+	"EXCEPT"
+	"KEYWORDS"
+.
+
+
+ProductionExpr =
+	ProdTerm
+	{
+	"|"
+	ProdTerm
+	}
+.
+
+ProdTerm =
+	ProdFactor
+	{
+	ProdFactor
+	}
+.
+
+ProdFactor =
+	(
+	SymbolProd
+	|
+	"("ProductionExpr")"
+	|
+	"["ProductionExpr"]"
+	|
+	"{"ProductionExpr"}"
+	)
+	[Codigo]
+.
+
+
+
+SymbolProd =			(.string SV = new string(' ',0);
+				  string IN = new string(' ',0);.)
+	(
+	String<ref SV>		(.System.Console.WriteLine("String en Production: {0}",SV);.)
+	|
+	char
+	|
+	Ident<ref IN>		(.System.Console.WriteLine("Identificador en Production: {0}",IN);.)
+	[Atributos] 
+	)
+.
+
+Codigo =
+	startcode
+	{ ANY }
+	endcode
+.
+
+Atributos =
+	"<"
+	{ANY}
+	">"
+.
+	
+
+
+TokenExpr=
+	TokenTerm
+	{
+	"|"
+	TokenTerm
+	}
+.
+
+TokenTerm=
+	TokenFactor
+	{
+	TokenFactor	
+	}
+.
+
+TokenFactor=
+	(
+	SimbolToken
+	|
+	"("TokenExpr")"
+	|
+	"["TokenExpr"]"
+	|
+	"{"TokenExpr"}"
+	)
+.
+
+SimbolToken =			(.string IdentName = new string(' ',0);
+				  string StringValue = new string(' ',0);.)		
+	(
+	String<ref StringValue>
+	|
+	char
+	|
+	Ident<ref IdentName>	(.System.Console.WriteLine("Identificador en Token: {0}",IdentName);.)
+	)
+.
+
+
+
+CharSet= 			(.string IdentName = new string(' ',0);
+				  string StringValue = new string(' ',0);.)	
+	(
+	String<ref StringValue>
+	|
+	Char
+	|
+	"ANY"
+	|
+	Ident<ref IdentName>	(.System.Console.WriteLine("Identificador en CharSet: {0}",IdentName);.)
+	)
+	
+.
+
+
+Char=
+	(
+	char
+	|
+	charnumber
+	|
+	charinterval
+	)
+.
+
+
+String<ref string S>=
+	string		(.S = LastToken.Value;.)
+.
+
+Ident<ref string S>=
+	ident		(.S = LastToken.Value;.)
+.
+
+
+END MyCOCOR

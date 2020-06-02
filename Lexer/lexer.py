@@ -546,8 +546,12 @@ def removeUseless(nodes):
         
 def regexToDFA(regex, tag, priority):
 
-    #USING DUCT TAPE TO SAVE THE BOAT
-    if len(regex) == 1:
+    #USING DUCT TAPE TO SAVE THE TITANIC
+    if len(regex) == 1 or regex == "(>)" or regex == "(<)":
+        # Condition
+        if len(regex) > 1:
+            regex = regex[1]
+            
         # Nodes
         new_node0 = dfat("T0")
         new_node1 = dfat("T1")
@@ -556,6 +560,25 @@ def regexToDFA(regex, tag, priority):
         # Nodes group
         new_node0.setTransition(new_node1, regex)
         nodes_dfa = [new_node0, new_node1]
+
+        # Details
+        setTags(nodes_dfa, tag)
+        setPriorities(nodes_dfa, priority)
+
+        return nodes_dfa
+
+    #USING DUCT TAPE TO SAVE A SMALL BOAT
+    if regex == "(.))" or regex == "((.)":
+        # Nodes
+        new_node0 = dfat("T0")
+        new_node1 = dfat("T1")
+        new_node2 = dfat("T2")
+        new_node2.setIsAcceptanceState()
+
+        # Nodes group
+        new_node0.setTransition(new_node1, regex[1])
+        new_node1.setTransition(new_node2, regex[2])
+        nodes_dfa = [new_node0, new_node1, new_node2]
 
         # Details
         setTags(nodes_dfa, tag)

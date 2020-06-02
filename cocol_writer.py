@@ -70,6 +70,26 @@ class CocolWriter():
         ''')
             counter += 1
 
+        ptokens = self.ptokens[::-1]
+
+        # Write tokens declare in productions
+        for i in ptokens:
+
+            priority += 1
+
+            # White spaces restriccions
+            regex = i[1].replace("\n", "\\n")
+            regex = regex.replace("\r", "\\r")
+            regex = regex.replace("\t", "\\t")
+
+            # Write token
+            file.write('''
+        nodes''' + str(counter) + \
+            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority)  + ''')
+        self.separateDFAs.append(nodes''' + str(counter) + ''')
+''')
+            counter += 1
+
         # Write keywords
         keys = self.keywords[::-1]
         for i in keys:
@@ -94,26 +114,6 @@ class CocolWriter():
 
             if i[2] == 0:
                 continue
-
-            priority += 1
-
-            # White spaces restriccions
-            regex = i[1].replace("\n", "\\n")
-            regex = regex.replace("\r", "\\r")
-            regex = regex.replace("\t", "\\t")
-
-            # Write token
-            file.write('''
-        nodes''' + str(counter) + \
-            ''' = lex.regexToDFA("''' + regex + '''","''' + str(i[0]) + '''",''' + str(priority)  + ''')
-        self.separateDFAs.append(nodes''' + str(counter) + ''')
-''')
-            counter += 1
-        
-        ptokens = self.ptokens[::-1]
-
-        # Write tokens declare in productions
-        for i in ptokens:
 
             priority += 1
 
@@ -173,6 +173,15 @@ class Parser():
 
             expected.append((priority,str(i[0])))
 
+        # Write ptoken
+        for i in ptokens:
+            priority += 1
+
+            file.write('''
+        self._''' + str(i[0]) + ''' = ''' + str(priority))
+
+            expected.append((priority,str(i[1])))
+
         # Write keywords
         for i in keywords:
             priority += 1
@@ -193,15 +202,6 @@ class Parser():
         self._''' + str(i[0]) + ''' = ''' + str(priority))
 
             expected.append((priority,str(i[0])))
-
-        # Write ptoken
-        for i in ptokens:
-            priority += 1
-
-            file.write('''
-        self._''' + str(i[0]) + ''' = ''' + str(priority))
-
-            expected.append((priority,str(i[1])))
 
         file.write('''
         self.maxT = ''' + str(priority + 1) + '''
@@ -262,14 +262,25 @@ class Parser():
     def Get(self):
         self.t = self.la
         self.la = self.sc.scan()
-        if self.la.get_tok_type() < 0 or self.la.get_tok_type() > self.maxT:
-            self.la = self.t
+
+        while self.la.get_tok_type() == -1:
+            self.la = self.sc.scan()
+
+        if self.t.get_tok_type() == -3:
+            print("END REACHED")
+            exit()
+
+    def Any(self, stop):
+        while self.la.get_name() != stop:
+            self.Get()
 
     def Expect(self, expected):
         if self.la.get_tok_type() == expected:
             self.Get()
         else:
-            self.SymError(expected)   ''')
+            self.SymError(expected)   
+            self.Get()
+            self.Expect(expected)''')
 
         # Write funciton SymError
         file.write(''' 
@@ -292,7 +303,6 @@ class Parser():
         print("Last token : " + str(self.t))
         print("Last Look-a: " + str(self.la))
         print("Scanner Pointer: " + str(self.sc.pointer))
-        exit()
         ''')
 
 

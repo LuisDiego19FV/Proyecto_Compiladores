@@ -258,7 +258,10 @@ class CocolReader():
             included = False
             for j in self.comp_chars:
                 if i == j[0]:
-                    component += "(" + j[1] + ")"
+                    if j[1] == "\"":
+                        component += "(\\\")"
+                    else:
+                        component += "(" + j[1] + ")"
                     included = True
             
             if not included:
@@ -435,8 +438,8 @@ class CocolReader():
                 sections.append("ENDW")
                 curr_section = ""
                 continue
-            elif curr_section == "[" and not in_quote:
-                sections.append("[")
+            elif "[" in curr_section and not in_quote:
+                sections.append("if")
                 curr_section = ""
                 continue
             elif curr_section == "]" and not in_quote:
@@ -745,16 +748,16 @@ class CocolReader():
             
             # Check and change section
             if "." not in i and "=" not in i:
-                if "CHARACTERS" in i:
+                if "CHARACTERS" in i and curr_section != "PRO":
                     old_sections.append(curr_section)
                     curr_section = "CHA"
-                elif "KEYWORDS" in i:
+                elif "KEYWORDS" in i and curr_section != "PRO":
                     old_sections.append(curr_section)
                     curr_section = "KEY"
-                elif "TOKENS" in i:
+                elif "TOKENS" in i and curr_section != "PRO":
                     old_sections.append(curr_section)
                     curr_section = "TOK"
-                elif "PRODUCTIONS" in i:
+                elif "PRODUCTIONS" in i and curr_section != "PRO":
                     old_sections.append(curr_section)
                     curr_section = "PRO"
                 elif "END" in i and self.comp_name in i:

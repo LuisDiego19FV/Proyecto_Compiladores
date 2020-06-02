@@ -9,9 +9,12 @@ eol = CHR(10).
 space = CHR(32).
 whitespace = CHR(13)+eol+tab+space.
 
+
 KEYWORDS
 
 while = "while".
+do = "do".
+switch = "switch".
 
 TOKENS
 

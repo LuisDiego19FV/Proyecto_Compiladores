@@ -66,11 +66,11 @@
             else:
                 counter -= 1
 
-        #IF NOT TOKEN FOUND
+        #IF NO TOKEN FOUND
         if token == "":
             characters = self.buffer[self.pointer: counter + len(tokens) - 1]
             self.pointer = counter + len(tokens) - 1
-            return cls_token("end_token", characters, -3)
+            return cls_token("non_token", characters, -1)
         
         # TOKEN LENGHT CONDITION
         if self.pointer == counter - 1:
